@@ -8,6 +8,9 @@ import urllib.request
 import argparse
 from collections import defaultdict
 
+#TODO : add detailed description of what the code does. Explain why config file is necessary
+#TODO : Introducing error cases in case something doesn't work. Probably config file in wrong place could be an issue
+
 #%% Functions
 def create_url(variable, year, north, south, east, west, s_stride, t_stride, format):
     """Create the url for the DAYMET data."""
@@ -48,7 +51,7 @@ def save_file(url, out_file):
 def main(args):
     """Main function to download DAYMET data."""
     # variables = ['dayl', 'prcp', 'srad', 'swe', 'tmax', 'tmin', 'vp']
-    variables = ['dayl','prcp']
+    variables = ['dayl']
     save_config_dict = defaultdict()
     for variable in variables:
         for year in range(args.start_year, args.end_year + 1):
@@ -68,13 +71,13 @@ def main(args):
 
 #%% Main
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Download DAYMET data.")
+    parser = argparse.ArgumentParser(description="Download DAYMET data. Default bounding box is that of PAVICS")
     parser.add_argument('--start-year', type=int, default=1980, help='Start year')
     parser.add_argument('--end-year', type=int, default=1981, help='End year')
-    parser.add_argument('--north', type=float, default=55, help='North boundary')
+    parser.add_argument('--north', type=float, default=56, help='North boundary')
     parser.add_argument('--south', type=float, default=44.991, help='South boundary')
     parser.add_argument('--east', type=float, default=-63.551, help='East boundary')
-    parser.add_argument('--west', type=float, default=-79.579, help='West boundary')
+    parser.add_argument('--west', type=float, default=-65, help='West boundary')
     parser.add_argument('--s-stride', type=int, default=1, help='Spatial stride')
     parser.add_argument('--t-stride', type=int, default=1, help='Time stride')
     parser.add_argument('--format', type=str, default='netcdf', help='Format of the data')
@@ -83,8 +86,86 @@ if __name__ == "__main__":
 
     main(args)
 
+# Output example on the terminal :
+# python script.py --start-year 1980 --end-year 1985 --north 55 --south 44.991 --east -63.551 --west -79.579 --s-stride 1 --t-stride 1 --format netcdf --out-path ./output
 
-# Read OneNote//Météo//Daymet for description on what's going on with everything
+# Small output example on the terminal :
+# python script.py --start-year 1980 --end-year 1980 --north 55 --south 54 --east -63.551 --west -64 --s-stride 1 --t-stride 1 --format netcdf --out-path D:\Observations\Daymet
+
+#%% script alternative : get data (without downloading it) with siphon.catalogue
+import xarray as xr
+import dask
+
+#1 ) Use Siphon to access a THREDDS catalog
+url = 'https://thredds.daac.ornl.gov/thredds/catalog/ornldaac/2129/catalog.xml'
+from siphon.catalog import TDSCatalog
+cat = TDSCatalog(url)
+dataset_list = list(cat.datasets.keys())
+# print(list(cat.datasets.keys()))
+# https://thredds.daac.ornl.gov/thredds/ncss/ornldaac/2129/daymet_v4_daily_na_dayl_1980.nc?var=lat&var=lon&var=dayl&north=56&west=-65&east=-63.551&south=44.991&disableProjSubset=on&horizStride=1&time_start=1980-01-01T12%3A00%3A00Z&time_end=1980-12-31T12%3A00%3A00Z&timeStride=1&accept=netcdf
+
+# filter list based on the following criteria
+location = 'Continental North America'
+years = list(range(2000, 2002))  # convert the years to strings for comparison
+variables = ["daily maximum temperature", "vapor pressure"] # list of possible variables
+
+# loop through dataset_list (list of strings), find the index of the datasets that match the criteria
+print('Finding datasets that match the criteria')
+idx_list = []
+for idx,dataset in enumerate(dataset_list):
+    if location in dataset and any(variable in dataset for variable in variables) and int(dataset[-5:-1]) in years:
+        idx_list.append(idx)
+
+# loop through cat.datasets that are within idx_list. open each dataset has xarray dataset and save into one single list
+# xr_ds_list = []
+# for idx in idx_list:
+#     xr_ds_list.append(xr.open_dataset(cat.datasets[idx].access_urls["OPENDAP"], chunks="auto"))
+
+print('Opening datasets')
+dsets = [cat.datasets[idx].remote_access(use_xarray=True).reset_coords(drop=True).chunk({'time':1}) for idx in idx_list]
+
+ds = xr.combine_by_coords(dsets,combine_attrs='drop')
+ds = ds.sel(nv=0,drop=True)
+
+# Testing dataset with PAVICS single pixel extraction (see if we actually get data)
+def test_singlepoint_pixel(ds):
+    from clisops.core import subset
+    import pyproj
+    proj_daymet = "+proj=lcc +lat_0=42.5 +lon_0=-100 +lat_1=25 +lat_2=60 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs" #custom daymet crs
+    latlon_daymet_transform = pyproj.Transformer.from_crs("EPSG:4326", proj_daymet, always_xy=True)
+
+
+    lon = [-75.4, -85, -65.5]  # Longitude
+    lat = [46.67, 41, 55.3]  # Latitude
+    ds_gridpoint = subset.subset_gridpoint(ds, lon=lon, lat=lat)
+    print(ds_gridpoint)
+
+    # Plot first year of tasmax data
+    a = ds.tmax.isel(x=slice(0,3),y=slice(0,1),time=slice(0, 365))
+
+#%% Alternative with Microsoft PlanetaryComputer
+import pystac
+import fsspec
+from clisops.core import subset
+import xarray as xr
+
+# Tutorial : https://planetarycomputer.microsoft.com/dataset/daymet-daily-na#Example-Notebook
+# Adress : https://planetarycomputer.microsoft.com/dataset/group/daymet#north_america
+url = "https://planetarycomputer.microsoft.com/api/stac/v1/collections/daymet-daily-na"
+collection = pystac.read_file(url)
+asset = collection.assets["zarr-https"]
+store = fsspec.get_mapper(asset.href)
+ds = xr.open_zarr(store, **asset.extra_fields["xarray:open_kwargs"])
+ds = ds.sel(nv=0,drop=True)
+
+# Downscale to fit PAVICS grid
+# Subset over the polygon (LONG LOADING TIME AND ERROR IS PRODUCED
+tmp = ds.isel(time = 5000)
+ds_poly = subset.subset_shape(
+    ds, shape="E:\\GIS\\PAVICS\\RegionAgricolesQC.geojson"
+)  # use path to layer
+
+# OLD SCRIPT : Read OneNote//Météo//Daymet for description on what's going on with everything
 #
 #
 # STARTYEAR = 1980

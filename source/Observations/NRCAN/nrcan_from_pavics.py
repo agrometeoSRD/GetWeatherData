@@ -2,7 +2,7 @@
 """
 Creation date: 2023-04-19
 Creator : sebastien.durocher 
-Python version : 3.9
+Python version : 3.10
 
 Description:
 - Inspired from the PAVICS tutorial, we will extract NRCAN v2 data for a list of specific lat and lon indices
@@ -10,10 +10,8 @@ Description:
 Updates:
 
 Notes:
-
+- 2023-08-02 DEPRECATED FILE BUT STILL KEEP BECAUSE IT COULD STILL CONTAIN SOME USEFUL CODE. See get_nrcan.py instead
 """
-
-# TODO : do the job
 
 # %% imports
 from xclim import atmos

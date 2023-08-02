@@ -18,7 +18,7 @@ from xclim import units
 from siphon.catalog import TDSCatalog
 
 def get_data():
-    # %% get url and metadata
+    # get url and metadata
     url = "https://pavics.ouranos.ca/twitcher/ows/proxy/thredds/catalog/datasets/gridded_obs/catalog.html?dataset=datasets/gridded_obs/nrcan_v2.ncml"
     # url = "https://pavics.ouranos.ca/twitcher/ows/proxy/thredds/catalog/datasets/simulations/bias_adjusted/cmip5/ouranos/cb-oura-1.0/catalog.xml"  # TEST_USE_PROD_DATA
 
@@ -32,7 +32,7 @@ def get_data():
     cds = cat.datasets[0]
     print(f"Access URLs: {tuple(cds.access_urls.keys())}")
 
-    # %% Open with xarray
+    # Open with xarray
 
     ds = xr.open_dataset(cds.access_urls["OPENDAP"], chunks="auto")
 

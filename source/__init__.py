@@ -10,3 +10,5 @@ Notes:
 """
 
 from .Observations.NRCAN import get_nrcan
+from .Observations.Daymet import Get_Daymet_Area
+

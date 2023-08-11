@@ -15,6 +15,6 @@ setup(
     name='GetWeatherData',
     version='0.1',
     packages=find_packages(),
-    install_requires=["xarray >= 2023.7.0","xclim >= 0.44.0", "siphon >= 0.9"],
+    install_requires=["xarray >= 2023.7.0","xclim >= 0.44.0", "siphon >= 0.9", "pystac", "fsspec", "clisops", "zarr"],
     python_requires=">=3.9.0",
 )

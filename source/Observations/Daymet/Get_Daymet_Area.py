@@ -1,6 +1,8 @@
 #! /usr/bin/env python
 # Load daymet in an area. Output is netcdf
 
+#TODO : create a reproducible array function
+
 # imports
 import os
 import json
@@ -26,6 +28,49 @@ import fsspec
 from clisops.core import subset
 
 shape_path = f"C:\\Users\\{os.getenv('USERNAME')}\\OneDrive - IRDA\\GIS\\RegionAgricolesQC.geojson"
+
+def create_reproducible_array(
+    dimensions  : dict,
+    missing_pct : float = 0.1,
+    random      : bool  = False,
+    random_seed : int   = None,
+        ) -> xr.DataArray:
+
+    import numpy as np
+
+    # Use this example
+        # # Small configuration to verify correctness
+        #  small_config = {
+        #      'data_kwargs'   : {
+        #          'dimensions' : { # Dimensions of the DataArray
+        #              'time'      : 3,
+        #              'latitude'  : 5,
+        #              'longitude' : 5,
+        #          },
+        #          'random_seed' : 42,
+        #      },
+        #      'chunks' : { # Initial data chunking
+        #          'time'      : 2,
+        #          'latitude'  : 2,
+        #          'longitude' : 2,
+        #      },
+        #      'depth' : { # 2 x 3 x 3 window
+        #          'time'      : 1, # 1 lookback step = window depth  2
+        #          'latitude'  : 1, # 1 adjacent lats = window height 3
+        #          'longitude' : 1, # 1 adjacent lons = window width  3
+        #      },
+        #  }
+        # config = small_config
+        # data   = create_reproducible_array(**config['data_kwargs'])
+
+    numpy_rng    = np.random.default_rng(random_seed)
+    keys, shapes = zip(*dimensions.items())
+    if random: a = numpy_rng.random(shapes, dtype='float32')
+    else:      a = np.arange(np.prod(shapes), dtype='float32').reshape(shapes)
+    missing_idxs = i = numpy_rng.integers(0, a.size, int(a.size * missing_pct))
+    a.ravel()[i] = np.nan
+
+    return xr.DataArray(a, coords=dict(zip(keys, map(np.arange, shapes))))
 
 def get_url(frequency: str) -> str:
     """
@@ -66,12 +111,14 @@ def load_dataset(frequency: str, subsetting = True) -> xr.Dataset:
     Returns:
     An xarray Dataset
     """
+    print(f'Loading Daymet {frequency} dataset from Microsoft Planetary Computer...')
     url = get_url(frequency)
     collection = pystac.read_file(url)
     asset = collection.assets["zarr-https"]
     store = fsspec.get_mapper(asset.href)
     ds = xr.open_zarr(store, **asset.extra_fields["xarray:open_kwargs"])
     if subsetting == True:
+        print('-> Subsetting with RegionAgricoleQC.geojson...')
         ds = subset_by_shape(ds, shape_path)
     return ds.sel(nv=0, drop=True)
 
@@ -80,7 +127,7 @@ def main(frequency: str):
     print(ds)
 
 if __name__ == "__main__":
-    freq = input("Enter the frequency (daily, monthly, annual): ")
+    freq = 'daily'
     main(freq)
 
 # #%% Functions

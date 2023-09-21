@@ -1,7 +1,10 @@
 #! /usr/bin/env python
 # Load daymet in an area. Output is netcdf
 
-#TODO : create a reproducible array function
+#TODO : create a reproducible array function (having issues because daymet works in x,y with lat,lon being in 2d... abandoning the idea for now. Maybe just best to create a small slice of the dataset)
+#TODO : add detailed description of what the code does.
+#TODO : add dask multiple interpreter
+#TODO : something to make shape_path more flexible to different OS and users
 
 # imports
 import os
@@ -10,9 +13,6 @@ import urllib.request
 import argparse
 from collections import defaultdict
 
-#TODO : add detailed description of what the code does.
-#TODO : add dask multiple interpreter
-#TODO : something to make shape_path more flexible to different OS and users
 
 # # Try to accelerate the process with dask (doesn't work)
 # from dask.distributed import Client
@@ -29,48 +29,137 @@ from clisops.core import subset
 
 shape_path = f"C:\\Users\\{os.getenv('USERNAME')}\\OneDrive - IRDA\\GIS\\RegionAgricolesQC.geojson"
 
-def create_reproducible_array(
-    dimensions  : dict,
-    missing_pct : float = 0.1,
-    random      : bool  = False,
-    random_seed : int   = None,
-        ) -> xr.DataArray:
+# def create_reproducible_array(
+#     dimensions  : dict,
+#     missing_pct : float = 0.1,
+#     random      : bool  = False,
+#     random_seed : int   = None,
+#         ) -> xr.DataArray:
+#
+#     import numpy as np
+#
+#     numpy_rng    = np.random.default_rng(random_seed)
+#     # numpy_rng = np.random.default_rng(config['data_kwargs'].get('random_seed', None))
+#
+#     keys, shapes = zip(*dimensions.items())
+#     # dimensions = config['data_kwargs']['dimensions']
+#     # coords = {key: np.linspace(start, end, size) for key, (start, end, size) in dimensions.items()}
+#     # shapes = tuple(dimensions[key][2] for key in dimensions)
+#
+#     if random: a = numpy_rng.random(shapes, dtype='float32')
+#     else:      a = np.arange(np.prod(shapes), dtype='float32').reshape(shapes)
+#     missing_idxs = i = numpy_rng.integers(0, a.size, int(a.size * missing_pct))
+#     a.ravel()[i] = np.nan
+#
+#     return xr.DataArray(a, coords=dict(zip(keys, map(np.arange, shapes))))
 
-    import numpy as np
 
-    # Use this example
-        # # Small configuration to verify correctness
-        #  small_config = {
-        #      'data_kwargs'   : {
-        #          'dimensions' : { # Dimensions of the DataArray
-        #              'time'      : 3,
-        #              'latitude'  : 5,
-        #              'longitude' : 5,
-        #          },
-        #          'random_seed' : 42,
-        #      },
-        #      'chunks' : { # Initial data chunking
-        #          'time'      : 2,
-        #          'latitude'  : 2,
-        #          'longitude' : 2,
-        #      },
-        #      'depth' : { # 2 x 3 x 3 window
-        #          'time'      : 1, # 1 lookback step = window depth  2
-        #          'latitude'  : 1, # 1 adjacent lats = window height 3
-        #          'longitude' : 1, # 1 adjacent lons = window width  3
-        #      },
-        #  }
-        # config = small_config
-        # data   = create_reproducible_array(**config['data_kwargs'])
+# def generate_dataset():
+#     import pandas as pd
+#     import numpy as np
+#     y_vals = 5
+#     x_vals = 10
+#     time_vals = pd.date_range('1980-01-01', '1980-12-31', freq='D')
+#
+#     # coordinates
+#     y = np.linspace(4.984e+06, -3.09e+06, y_vals)
+#     x = np.linspace(-4.56e+06, 3.253e+06, x_vals)
+#     lon,lat = np.meshgrid(x,y)
+#
+#     # lat = np.linspace(10, 60, y_vals)
+#     # lon = np.linspace(-130, 60, x_vals)
+#     coords = {'time':time_vals,'lat':lat,'lon':lon}
+#
+#     # create artificial data based on dimension size (ideally would be based on values that make somewhat sense)
+#     prcp = np.random.rand(len(time_vals), y_vals, x_vals)
+#     swe = np.random.rand(len(time_vals), y_vals, x_vals)
+#     tmax = np.random.rand(len(time_vals), y_vals, x_vals) * 40 - 20  # Temp between -20 to 20
+#     tmin = np.random.rand(len(time_vals), y_vals, x_vals) * 40 - 20  # Temp between -20 to 20
+#     vp = np.random.rand(len(time_vals), y_vals, x_vals)
+#
+#     # add condition for missing percentage if want to deal with missing values
+#     random_seed = 42
+#     missing_pct = config['data_kwargs'].get('missing_pct', 0.1)
+#     numpy_rng    = np.random.default_rng(random_seed)
+#     missing_idxs = i = numpy_rng.integers(0, prcp.size, int(prcp.size * missing_pct))
+#     prcp.ravel()[i] = np.nan
+#
+#     # Create the dataset
+#     ds_sample = xr.Dataset(
+#             {
+#                 'prcp': (['time', 'y', 'x'], prcp),
+#                 'swe': (['time', 'y', 'x'], swe),
+#                 'tmax': (['time', 'y', 'x'], tmax),
+#                 'tmin': (['time', 'y', 'x'], tmin),
+#                 'vp': (['time', 'y', 'x'], vp),
+#                 'lambert_conformal_conic': 16,
+#                 'time_bnds': time_vals,
+#             },
+#             coords={
+#                 'lat': (['y', 'x'], lat),
+#                 'lon': (['y', 'x'], lon),
+#                 'time': time_vals,
+#                 # 'y': y,
+#                 # 'x': x
+#             },
+#             attrs={
+#                 'Conventions': 'CF-1.6',
+#                 'Version_data': 'Daymet Data Version 4.0',
+#                 'Version_software': 'Daymet Software Version 4.0',
+#                 'citation': 'Please see http://daymet.ornl.gov/ for current Daymet data citations.',
+#                 'references': 'Please see http://daymet.ornl.gov/ for current information on Daymet references.',
+#                 'source': 'Daymet Software Version 4.0',
+#                 'start_year': '1980'
+#             }
+#         )
 
-    numpy_rng    = np.random.default_rng(random_seed)
-    keys, shapes = zip(*dimensions.items())
-    if random: a = numpy_rng.random(shapes, dtype='float32')
-    else:      a = np.arange(np.prod(shapes), dtype='float32').reshape(shapes)
-    missing_idxs = i = numpy_rng.integers(0, a.size, int(a.size * missing_pct))
-    a.ravel()[i] = np.nan
+# # Use this example from the website
+# # Small configuration to verify correctness
+#  small_config = {
+#      'data_kwargs'   : {
+#          'dimensions' : { # Dimensions of the DataArray
+#              'time'      : ("1980-01-01", "1980-12-31", 365),
+#              'latitude'  : (10, 60, 5),
+#              'longitude' : (-130, -60, 10),
+#          },
+#          'random_seed' : 42,
+#      },
+#      'chunks' : { # Initial data chunking
+#          'time'      : 2,
+#          'latitude'  : 2,
+#          'longitude' : 2,
+#      },
+#      'depth' : { # 2 x 3 x 3 window
+#          'time'      : 1, # 1 lookback step = window depth  2
+#          'latitude'  : 1, # 1 adjacent lats = window height 3
+#          'longitude' : 1, # 1 adjacent lons = window width  3
+#      },
+#  }
+# config = small_config
+# data   = create_reproducible_array(**config['data_kwargs'])
 
-    return xr.DataArray(a, coords=dict(zip(keys, map(np.arange, shapes))))
+# Try modified example with pretend daymet
+# daymetconfig = {
+#     'data_kwargs': {
+#         'dimensions': {
+#             'time': ("1980-01-01", "1980-12-31", 365),
+#             'latitude': (10, 60, 5),
+#             'longitude': (-130, -60, 10),
+#         },
+#         'random_seed': 42,
+#         'random': True,
+#     },
+#     'chunks': {
+#         'time': 2,
+#         'latitude': 2,
+#         'longitude': 2,
+#     },
+#     'depth': {
+#         'time': 1,
+#         'latitude': 1,
+#         'longitude': 1,
+#     },
+# }
 
 def get_url(frequency: str) -> str:
     """

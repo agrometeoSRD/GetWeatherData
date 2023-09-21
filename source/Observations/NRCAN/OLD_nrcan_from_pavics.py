@@ -12,6 +12,7 @@ Updates:
 Notes:
 - 2023-08-02 DEPRECATED FILE BUT STILL KEEP BECAUSE IT COULD STILL CONTAIN SOME USEFUL CODE. See get_nrcan.py instead
 """
+#todo deprecated file but still keep because it could still contain some useful code. See get_nrcan.py instead
 
 # %% imports
 from xclim import atmos

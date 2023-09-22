@@ -19,10 +19,7 @@ import xarray as xr
 from xclim import units
 from siphon.catalog import TDSCatalog
 from clisops.core import subset
-
-from .utils import *
-
-from ..utils.subsetting import subset_data
+from source.utils import subsetting
 
 shape_path = f"C:\\Users\\{os.getenv('USERNAME')}\\OneDrive - IRDA\\GIS\\RegionAgricolesQC.geojson"
 
@@ -43,16 +40,16 @@ def get_meta():
     return cds
 
 #Open with xarray
-def open_cds(cds, subsetting = True) -> xr.Dataset:
+def open_cds(cds, do_subset = True) -> xr.Dataset:
     ds = xr.open_dataset(cds.access_urls["OPENDAP"], chunks="auto")
 
     # convert units to celcius
     ds['tas'] = units.convert_units_to(ds['tas'], target='degC')
     ds['tasmax'] = units.convert_units_to(ds['tasmax'], target='degC')
     ds['tasmin'] = units.convert_units_to(ds['tasmin'], target='degC')
-    if subsetting == True:
+    if do_subset == True:
         print('-> Subsetting with RegionAgricoleQC.geojson...')
-        ds = subset_by_shape(ds, shape_path)
+        ds = subsetting.subset_by_shape(ds, shape_path)
     return ds
 
 

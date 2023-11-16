@@ -8,7 +8,8 @@ from wunderground_pws import WUndergroundAPI, units
 #TODO : Check wether it would be necessary to compute hourly precipitation
 #TODO : Hourly mean the data (temperature, wind, pressure, dewpoint). Get the last value of the hour for precipitation
 #TODO : Make the history call go back more than 7 days
-#TODO : Create error cases for wether : file is already open, 
+#TODO : Create error cases for wether : file is already open
+#TODO : add an extra column that mentions if the data is from historical or current data
 
 
 def load_existing_data(filepath):
@@ -31,7 +32,7 @@ def extract_data_from_json(history):
         data_to_save.append(row)
     return data_to_save
 
-def resample_to_15min_avg(df:pd.DataFrame, datetime_col:str, cols_to_average:list):
+def resample_to_hour_avg(df:pd.DataFrame, datetime_col:str, cols_to_average:list):
     """
     Resample the DataFrame to get 15-minute averages for the specified columns.
 
@@ -49,7 +50,7 @@ def resample_to_15min_avg(df:pd.DataFrame, datetime_col:str, cols_to_average:lis
     df.set_index(datetime_col, inplace=True)
 
     # Now, resample and compute the mean for the specified columns
-    resampled_df = df[cols_to_average].resample('15T').mean()
+    resampled_df = df[cols_to_average].resample('H').mean()
 
     return resampled_df
 
@@ -72,14 +73,15 @@ def main(history, csv_file_path):
     new_data_list = extract_data_from_json(history)
     new_data_df = pd.DataFrame(new_data_list)
     cols_to_average = ['tempAvg', 'windspeedAvg', 'dewptAvg', 'pressureTrend']
-    resampled_df = resample_to_15min_avg(new_data_df, 'obsTimeLocal', cols_to_average)
+    resampled_df = resample_to_hour_avg(new_data_df, 'obsTimeLocal', cols_to_average)
+    # Add total precipitation
+    resampled_df['precipTotal'] = new_data_df['precipTotal'].resample('H').last()
     update_and_save_data(resampled_df, csv_file_path)
 
 # Define the CSV file name
 csv_file_name = f'{os.getcwd()}\weather_data.csv'
 
 wu = WUndergroundAPI(
-    api_key='df9887ba00fb4f589887ba00fbff58c9',
     default_station_id='ISAINT6465',
     units=units.METRIC_SI_UNITS,
 )

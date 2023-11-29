@@ -69,24 +69,32 @@ def update_and_save_data(new_data, filepath):
 
 
 def main(history, csv_file_path):
-    """Main function to process and save weather data."""
+    """Main function to process weather data and return a DataFrame for PowerBI."""
     new_data_list = extract_data_from_json(history)
     new_data_df = pd.DataFrame(new_data_list)
     cols_to_average = ['tempAvg', 'windspeedAvg', 'dewptAvg', 'pressureTrend']
     resampled_df = resample_to_hour_avg(new_data_df, 'obsTimeLocal', cols_to_average)
     # Add total precipitation
     resampled_df['precipTotal'] = new_data_df['precipTotal'].resample('H').last()
-    update_and_save_data(resampled_df, csv_file_path)
+    # update_and_save_data(resampled_df, csv_file_path) # save to csv, not necessary for now cause trying out PowerBI
+
+    # reset index so that it turns into a column
+    resampled_df = resampled_df.reset_index()
+
+    return resampled_df
 
 # Define the CSV file name
 csv_file_name = f'{os.getcwd()}\weather_data.csv'
 
 wu = WUndergroundAPI(
+    api_key='df9887ba00fb4f589887ba00fbff58c9',
     default_station_id='ISAINT6465',
     units=units.METRIC_SI_UNITS,
 )
 history = wu.hourly()
-main(history, csv_file_name)
+
+if __name__ == '__main__':
+    testdf = main(history, csv_file_name)
 
 # Printing the data ------------------------------------------------------------------------------
 # print('Current status of my weather station:')

@@ -1,0 +1,6 @@
+# Le code va ignorer les lignes qui débutent avec un hashtag
+# Ce Ficher (Chemins_Acces.txt) doit être dans le même répertoire que l'executable (Get_ECCC_Forecast_ForRIMpro.py)
+# Le premier chemin doit être pour le ficher avec les stations. Le nom du fichier doit être inclut
+# La deuxième ligne est pour diriger les sorties de code
+C:\Users\sebastien.durocher\PycharmProjects\GetWeatherData\source\Forecasts\VStations_test.dat
+C:\Users\sebastien.durocher\PycharmProjects\GetWeatherData\source\Forecasts

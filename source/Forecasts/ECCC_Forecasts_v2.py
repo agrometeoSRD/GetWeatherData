@@ -15,10 +15,12 @@ Notes:
     - This only works for eastern time zones
 """
 #TODO : Create automatic file to get acces to station data. Add the necessary errors to make sure the data is there
-#TODO : Expand the forecast to include RDPS and GDPS
+#TODO : Test fonctions for anomalous data
+#TODO : Test forecast with multiple stations
 #TODO : Create a seperate script that would accept the forecast data and convert it into RIMpro
 #TODO : Apply asyncio to the script
 #TODO : Create some kind of secondary dictionnary that associates each variable with its corresponding forecast variable, that way the user can easily specify the variables that he wants and then the code will get the corresponding layers
+#TODO : Find some way to incorporate a percentage progress bar
 
 # imports
 import os
@@ -44,7 +46,7 @@ import pytz
 # Function to request weather data for a given layer, time, and coordinates
 wms_url = 'https://geo.weather.gc.ca/geomet/?SERVICE=WMS&REQUEST=GetFeatureInfo'
 wms = WebMapService(wms_url , version='1.3.0', timeout=300)
-common_var_names = ['TT', 'HR', 'PR'] # These are the common variable names between the different forecast models
+common_var_names = ['TT', 'HR', 'PR', 'N4'] # These are the common variable names between the different forecast models
 forecast_variables = ["AIRTEMP", "HR", "RAIN","GLOBALRAD"] # This is the desired variable names for the final dataframe
 
 def request(layer: str, times: list, coor: list) -> list:
@@ -151,7 +153,7 @@ def run_RDPS(coor: list, nb_timestep=None):
     return RDPS_df
 
 # Main processing function to get RDPS, GDPS, and HRDPS data for each station
-def process_request(station_info: pd.DataFrame, nb_timestep=24) -> pd.Series:
+def process_request(station_info: pd.DataFrame, nb_timestep=24) -> dict:
     '''
     process_request is being applied on a pandas dataframe. Therefore the output will be a pd.series where each row is the forecast dictionnary
 
@@ -183,7 +185,7 @@ def fill_missing_hours(df : pd.DataFrame, date_col : str) -> pd.DataFrame:
           )
     return df
 
-def process_forecast(forecast_dict : dict) -> pd.DataFrame:
+def concatenate_forecasts(forecast_dict : dict) -> pd.DataFrame:
     '''
     Combine forecast data into a single uniform time series
     :return: A single dataframe with all forecast data combined into a single time series
@@ -202,7 +204,12 @@ def process_forecast(forecast_dict : dict) -> pd.DataFrame:
         df_merged[forecast_variables[i]] = reduce(lambda left, right: left.combine_first(right),
                                                        [df_merged[gr] for gr in groups[i]])
 
-    return df_merged
+    return df_merged[['Date'] + forecast_variables]
+
+def process_forecast():
+    pass
+    # Linear interpolation of missing values
+
 
 def load_past_forecast(past_path: str, filename : str) -> pd.DataFrame:
     '''
@@ -234,14 +241,17 @@ def save_forecast(forecast_df:pd.DataFrame, save_path : str,filename : str):
     forecast_df.to_csv(f"{save_path}\\{filename}.csv", index=False, sep=';')
 
 # Read station information and process each station
-Path_To_Script = r"C:\Users\sebastien.durocher\PycharmProjects\GetWeatherData\source\Forecasts"
+Path_To_Script = r"C:\Scripts\PycharmProjects\GetWeatherData\source\Forecasts"
 InFile = os.path.join(Path_To_Script, 'VStations_test.dat')
 Stations_info = pd.read_csv(InFile, skiprows=2)
 Stations_info['Lon2'] = Stations_info['Lon'] + 0.1
 Stations_info['Lat2'] = Stations_info['Lat'] - 0.1
 
-results = Stations_info.apply(lambda row: process_request(row, nb_timestep=3), axis=1)
+results = Stations_info.apply(lambda row: process_request(row, nb_timestep=10), axis=1)
+# Only works with one station value
 for forecast in results:
-    forecast_dataframe = process_forecast(forecast)
-    save_forecast()
+    forecast_dataframe = concatenate_forecasts(forecast)
+    # process_forecast
+    # save_forecast()
+    # TODO : WHATS NEXT : INTERPOLATE MISING HOURS
 # 'results' is a Series of dictionaries containing RDPS, GDPS, and HRDPS data for each station

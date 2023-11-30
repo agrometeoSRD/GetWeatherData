@@ -125,7 +125,7 @@ wms = WebMapService('https://geo.weather.gc.ca/geomet?SERVICE=WMS' +
                     timeout=300)
 
 # Setup the paths
-Path_To_Script = r"C:\\Users\\sebastien.durocher\\PycharmProjects\\GetWeatherData\\source\\Forecasts"
+Path_To_Script = r"C:\Scripts\PycharmProjects\GetWeatherData\source\Forecasts"
 # Path_To_Script = os.getcwd()
 # Open file that contains path for station coordinates
 paths = list()
@@ -193,23 +193,25 @@ Stations_info.apply(process_request, axis=1)
 #     RDPS_df['RDPS.ETA_PR'] = RDPS_df['RDPS.ETA_PR'].diff()
 #     return RDPS_df
 
-class BaseForecastSource:
-    def fetch_data(self, layer, time, coordinates):
-        raise NotImplementedError
-    def transform_to_dataframe(self, parsed_data):
-        raise NotImplementedError
-class RDPSForecastSource(BaseForecastSource):
-
-    def __init__(self):
-        self.nb_timestep = None
-    def fetch_data(self, layer, time, coordinates):
-        time_local, time_utc = get_forecast_times(layer)  # setup time as a base
-        self.time_local = time_local  # Storing for later use in transform_to_dataframe
-        pixel_value_dict_rdps = {layer: request(layer, time_utc[:self.nb_timestep],coordinates) for layer in RDPS_varlist}
-
-    def transform_to_dataframe(self, pixel_value_dict_rdps):
-        # RDPS-specific transformation logic
-        time_local, time_utc = get_forecast_times(RDPS_varlist[0])  # setup time as a base
-        RDPS_df = pd.DataFrame.from_dict(pixel_value_dict_rdps, orient='index').transpose()
-        RDPS_df['Date'] = time_local[:self.nb_timestep]
-        RDPS_df['RDPS.ETA_PR'] = RDPS_df['RDPS.ETA_PR'].diff()
+# class BaseForecastSource:
+#     def fetch_data(self, layer, time, coordinates):
+#         raise NotImplementedError
+#     def transform_to_dataframe(self, parsed_data):
+#         raise NotImplementedError
+# class RDPSForecastSource(BaseForecastSource):
+#
+#     def __init__(self,nb_timestep=None,layer=None):
+#         self.nb_timestep = nb_timestep
+#         self.layer = layer
+#
+#     def fetch_data(self, layer, time, coordinates):
+#         time_local, time_utc = get_forecast_times(layer)  # setup time as a base
+#         self.time_local = time_local  # Storing for later use in transform_to_dataframe
+#         pixel_value_dict_rdps = {layer: request(layer, time_utc[:self.nb_timestep],coordinates) for layer in RDPS_varlist}
+#
+#     def transform_to_dataframe(self, pixel_value_dict_rdps):
+#         # RDPS-specific transformation logic
+#         time_local, time_utc = get_forecast_times(RDPS_varlist[0])  # setup time as a base
+#         RDPS_df = pd.DataFrame.from_dict(pixel_value_dict_rdps, orient='index').transpose()
+#         RDPS_df['Date'] = time_local[:self.nb_timestep]
+#         RDPS_df['RDPS.ETA_PR'] = RDPS_df['RDPS.ETA_PR'].diff()

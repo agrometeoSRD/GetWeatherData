@@ -33,6 +33,7 @@ import numpy as np
 import pandas as pd
 from owslib.util import ServiceException
 from owslib.wms import WebMapService
+from functools import reduce
 
 warnings.filterwarnings("ignore")
 
@@ -163,13 +164,12 @@ def process_request(station_info: pd.DataFrame, nb_timestep=24) -> dict:
     '''
     coor = [station_info['Lon'], station_info['Lat2'], station_info['Lon2'], station_info['Lat']]
 
-    RDPS_df = run_RDPS(coor, nb_timestep) # Function run_RDPS should be previously defined
-    GDPS_df = run_GDPS(coor, nb_timestep)
-    HRDPS_df = run_HRDPS(coor, nb_timestep)
+    RDPS_df = run_RDPS(coor, nb_timestep=84)
+    GDPS_df = run_GDPS(coor, nb_timestep=120)
+    HRDPS_df = run_HRDPS(coor, nb_timestep=48)
 
     return {'RDPS': RDPS_df, 'GDPS': GDPS_df, 'HRDPS': HRDPS_df}
 
-from functools import reduce
 def fill_missing_hours(df : pd.DataFrame, date_col : str) -> pd.DataFrame:
     min_date = df[date_col].min()
     max_date = df[date_col].max()
@@ -240,18 +240,23 @@ def save_forecast(forecast_df:pd.DataFrame, save_path : str,filename : str):
     print('Saving forecast to : ')
     forecast_df.to_csv(f"{save_path}\\{filename}.csv", index=False, sep=';')
 
+import time
+start_time = time.time()
+
 # Read station information and process each station
-Path_To_Script = r"C:\Scripts\PycharmProjects\GetWeatherData\source\Forecasts"
+Path_To_Script = r"C:\Users\sebastien.durocher\PycharmProjects\GetWeatherData\source\Forecasts"
 InFile = os.path.join(Path_To_Script, 'VStations_test.dat')
 Stations_info = pd.read_csv(InFile, skiprows=2)
 Stations_info['Lon2'] = Stations_info['Lon'] + 0.1
 Stations_info['Lat2'] = Stations_info['Lat'] - 0.1
 
 results = Stations_info.apply(lambda row: process_request(row, nb_timestep=10), axis=1)
+# 'results' is a Series of dictionaries containing RDPS, GDPS, and HRDPS data for each station
 # Only works with one station value
 for forecast in results:
     forecast_dataframe = concatenate_forecasts(forecast)
     # process_forecast
     # save_forecast()
     # TODO : WHATS NEXT : INTERPOLATE MISING HOURS
-# 'results' is a Series of dictionaries containing RDPS, GDPS, and HRDPS data for each station
+    forecast_dataframe = forecast_dataframe.interpolate()
+elapsed_time = time.time() - start_time

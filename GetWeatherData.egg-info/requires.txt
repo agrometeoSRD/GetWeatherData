@@ -1,3 +1,0 @@
-xarray>=2023.7.0
-xclim>=0.44.0
-siphon>=0.9

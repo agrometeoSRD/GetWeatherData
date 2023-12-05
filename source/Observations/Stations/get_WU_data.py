@@ -91,7 +91,16 @@ wu = WUndergroundAPI(
     default_station_id='ISAINT6465',
     units=units.METRIC_SI_UNITS,
 )
-history = wu.hourly()
+# history = wu.hourly()
+import datetime
+from pprint import pprint
+# Get historical data from the past 30 days
+days_past = 10
+end_date = datetime.datetime.now()
+start_date = end_date - datetime.timedelta(days=days_past)
+for single_date in pd.date_range(start_date, end_date):
+    tmp = wu.history(single_date)
+# pprint(wu.history(datetime.date(day=1, month=12, year=2023)))
 
 if __name__ == '__main__':
     testdf = main(history, csv_file_name)

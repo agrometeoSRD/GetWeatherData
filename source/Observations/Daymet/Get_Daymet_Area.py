@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 # Load daymet in an area. Output is netcdf
+# Known complexity : since downloading directly from website, loading time might be an issue
 
 #TODO : create a reproducible array function (having issues because daymet works in x,y with lat,lon being in 2d... abandoning the idea for now. Maybe just best to create a small slice of the dataset)
 #TODO : add detailed description of what the code does.
@@ -161,20 +162,36 @@ shape_path = f"C:\\Users\\{os.getenv('USERNAME')}\\OneDrive - IRDA\\GIS\\RegionA
 #     },
 # }
 
-def get_url(frequency: str) -> str:
-    """
-    Get the appropriate URL based on the desired frequency.
+# def get_url(frequency: str) -> str:
+#     """
+#     Get the appropriate URL based on the desired frequency.
+#
+#     Parameters:
+#     - frequency: Either 'daily', 'monthly', or 'annual'
+#
+#     Returns:
+#     The URL as a string.
+#     """
+#     base_url = "https://planetarycomputer.microsoft.com/api/stac/v1/collections/daymet-{}-na"
+#     if frequency not in ['daily', 'monthly', 'annual']:
+#         raise ValueError("Frequency should be either 'daily', 'monthly', or 'annual'")
+#     return base_url.format(frequency)
 
-    Parameters:
-    - frequency: Either 'daily', 'monthly', or 'annual'
+# TODO : Transform function into class and make it so that we can get either : daily data, yearly data, climate summaries
+def create_url(variable, year, north, south, east, west, s_stride, t_stride, format) -> str:
+    """Create the url for the DAYMET data."""
+    base_url = "https://thredds.daac.ornl.gov/thredds/ncss/ornldaac/2129/"
+    version_str = f"daymet_v4_daily_na_{variable}_{year}.nc?var=lat&var=lon&"
+    var_area_str = (f"var={variable}&north={north}&west={west}&east={east}&south={south}"
+                    f"&disableProjSubset=on&horizStride={s_stride}&")
+    time_str = f"time_start={year}-01-01T12%3A00%3A00Z&time_end={year}-12-31T12%3A00%3A00Z&timeStride={t_stride}&"
+    return f"{base_url}{version_str}{var_area_str}{time_str}accept={format}"
 
-    Returns:
-    The URL as a string.
-    """
-    base_url = "https://planetarycomputer.microsoft.com/api/stac/v1/collections/daymet-{}-na"
-    if frequency not in ['daily', 'monthly', 'annual']:
-        raise ValueError("Frequency should be either 'daily', 'monthly', or 'annual'")
-    return base_url.format(frequency)
+# Create a test function to see if the url works
+def test_url():
+    url = create_url('dayl', 1980, 56, 44.991, -63.551, -65, 1, 1, 'netcdf')
+    print(url)
+
 
 def subset_by_shape(ds: xr.Dataset, shape_path: str) -> xr.Dataset:
     """
@@ -220,15 +237,7 @@ if __name__ == "__main__":
     main(freq)
 
 # #%% Functions
-# def create_url(variable, year, north, south, east, west, s_stride, t_stride, format):
-#     """Create the url for the DAYMET data."""
-#     base_url = "https://thredds.daac.ornl.gov/thredds/ncss/ornldaac/2129/"
-#     version_str = f"daymet_v4_daily_na_{variable}_{year}.nc?var=lat&var=lon&"
-#     var_area_str = (f"var={variable}&north={north}&west={west}&east={east}&south={south}"
-#                     f"&disableProjSubset=on&horizStride={s_stride}&")
-#     time_str = f"time_start={year}-01-01T12%3A00%3A00Z&time_end={year}-12-31T12%3A00%3A00Z&timeStride={t_stride}&"
-#     return f"{base_url}{version_str}{var_area_str}{time_str}accept={format}"
-#
+
 # def save_config(args, out_path):
 #     """Save the configuration to a file."""
 #     config_file = os.path.join(out_path, "config.txt")

@@ -1,3 +1,4 @@
+#%%
 #!/usr/bin/env
 """
 Creation date: 2023-03-29
@@ -12,12 +13,15 @@ Updates:
 
 Notes:
     - Unlike all past iterations of getting forecast, now the forecast script doesn't transform the data into RIMpro format
+    - This only works for eastern time zones
 """
 #TODO : Create automatic file to get acces to station data. Add the necessary errors to make sure the data is there
-#TODO : Expand the forecast to include RDPS and GDPS
+#TODO : Test fonctions for anomalous data
+#TODO : Test forecast with multiple stations
 #TODO : Create a seperate script that would accept the forecast data and convert it into RIMpro
 #TODO : Apply asyncio to the script
 #TODO : Create some kind of secondary dictionnary that associates each variable with its corresponding forecast variable, that way the user can easily specify the variables that he wants and then the code will get the corresponding layers
+#TODO : Find some way to incorporate a percentage progress bar
 
 # imports
 import os
@@ -30,6 +34,7 @@ import numpy as np
 import pandas as pd
 from owslib.util import ServiceException
 from owslib.wms import WebMapService
+from functools import reduce
 
 warnings.filterwarnings("ignore")
 
@@ -38,180 +43,221 @@ import aiohttp
 import asyncio
 import pytz
 
-def request(layer : str, time : datetime.date, coor : list) -> list:
-    '''
 
-    @param layer:
-    @param time:
-    @param coor:
-    @return: list containing floats
-    '''
-    info = []
-    pixel_value = []
-    for timestep in time:
-        # WMS GetFeatureInfo query
-        print(timestep, layer)
+#%% Testing out chatgpt stuff
+# Function to request weather data for a given layer, time, and coordinates
+wms_url = 'https://geo.weather.gc.ca/geomet/?SERVICE=WMS&REQUEST=GetFeatureInfo'
+wms = WebMapService(wms_url , version='1.3.0', timeout=300)
+common_var_names = ['TT', 'HR', 'PR', 'N4'] # These are the common variable names between the different forecast models
+forecast_variables = ["AIRTEMP", "HR", "RAIN","GLOBALRAD"] # This is the desired variable names for the final dataframe
+
+def request(layer: str, times: list, coor: list) -> list:
+
+    pixel_values = []
+    for timestep in times:
         try:
-            info.append(wms.getfeatureinfo(layers=[layer],
-                                           srs='EPSG:4326',
-                                           bbox=tuple(coor),
-                                           size=(100, 100),
-                                           format='image/jpeg',
-                                           query_layers=[layer],
-                                           info_format='text/plain',
-                                           xy=(1, 1),
-                                           feature_count=1,
-                                           time=str(timestep.isoformat()) + 'Z'
-                                           ))
-            # Probability extraction from the request's results
-            text = info[-1].read().decode('utf-8')
-            pixel_value.append(str(re.findall(r'value_0\s+\d*.*\d+', text)))
-            try:
-                pixel_value[-1] = float(
-                    re.sub('value_0 = \'', '', pixel_value[-1])
-                        .strip('[""]')
-                )
-            except ValueError:
-                print(
-                    f'Problem with the extract data (most likely empty output) at time = {timestep} and layer = {layer}')
-                print('Returning empty float instead')
-                pixel_value[-1] = [np.nan]
+            response = wms.getfeatureinfo(
+                layers=[layer],
+                srs='EPSG:4326',
+                bbox=tuple(coor),
+                size=(100, 100),
+                format='image/jpeg',
+                query_layers=[layer],
+                info_format='text/plain',
+                xy=(1, 1),
+                feature_count=1,
+                time=timestep.isoformat() + 'Z'
+            )
+
+            text = response.read().decode('utf-8')
+            value_str = re.search(r'value_0\s+\d*.*\d+', text)
+            if value_str:
+                pixel_values.append(float(re.sub('value_0 = \'', '', value_str.group()).strip('[""]')))
+            else:
+                pixel_values.append(float('nan'))
         except ServiceException:
-            print(f'Request could not be made for some reason at time = {timestep} and layer = {layer}')
-            pixel_value.append(np.nan)
+            pixel_values.append(float('nan'))
 
-    return pixel_value
+    return pixel_values
 
-def get_forecast_times(layer:str,target_timezone='America/Montreal'):
-    """
-    Generate a list of forecast times for a given layer. Output two lists, once with time in local timezone and the other in UTC.
-    """
-    def convert_timezone(dt, tz):
-        # Convert the datetime object to UTC
-        utc_dt = dt.astimezone(pytz.utc)
-        # Convert the UTC datetime object to the specified timezone
-        tz_dt = utc_dt.astimezone(tz)
-        return tz_dt
+# Extraction of temporal information from metadata
+def time_parameters(layer):
+    start_time, end_time, interval = (wms[layer]
+                                      .dimensions['time']['values'][0]
+                                      .split('/')
+                                      )
+    iso_format = '%Y-%m-%dT%H:%M:%SZ'
+    start_time = datetime.strptime(start_time, iso_format)
+    end_time = datetime.strptime(end_time, iso_format)
+    interval = int(re.sub(r'\D', '', interval))
+    return start_time, end_time, interval
 
-    # Extract start time, end time, and interval
-    start_time, end_time, interval_str = wms[layer].dimensions['time']['values'][0].split('/')
-    interval = int(re.findall(r'\d+', interval_str)[0])  # Possible formats are : 'PT1H', 'PT3H' or 'PT6H'
+def setup_time(layer):
+    '''
+    This is what's proposed by ECCC in their tutorial
+    :param layer:
+    :return:
+    '''
+    # Setup time
+    au_tz = pytz.timezone('America/Montreal')
+    # get numerical time zone based on location (in this example, the local time zone would be UTC-05:00):
+    start_time, end_time, interval = time_parameters(layer)
 
-    # Parse times
-    iso_format = '%Y-%m-%dT%H:%M:%SZ' # ISO 8601 format that's used by wms
-    start_time = datetime.strptime(start_time, iso_format).replace(tzinfo=tz.UTC)
-    end_time = datetime.strptime(end_time, iso_format).replace(tzinfo=tz.UTC)
+    # Calculation of date and time for available predictions
+    # (the time variable represents time at UTC±00:00)
+    time_utc = [start_time]
+    while time_utc[-1] < end_time:
+        time_utc.append(time_utc[-1] + timedelta(hours=interval))
 
-    # Create list of times
-    time_list_utc = [start_time]
-    while time_list_utc[-1] < end_time:
-        time_list_utc.append(time_list_utc[-1] + timedelta(hours=interval))
+    # Convert time to local time zone
+    time_local = [t.replace(tzinfo=pytz.utc).astimezone(au_tz).replace(tzinfo=None) for t in time_utc]
 
-    # Convert list to local time
-    au_tz = pytz.timezone(target_timezone)
-    time_list_local = [convert_timezone(atime, au_tz).replace(tzinfo=None) for atime in time_list_utc]
+    return time_local,time_utc
 
-    return time_list_local, time_list_utc
+# Function to get GDPS data
+def run_GDPS(coor: list, nb_timestep=None):
+    print('Getting GDPS')
+    GDPS_varlist = ['GDPS.ETA_TT', 'GDPS.ETA_HR', 'GDPS.ETA_PR', 'GDPS.ETA_N4']
+    time_local, time_utc = setup_time(GDPS_varlist[0])
 
-# ===============================
-# Code start    =================
-# ===============================
-# Setup wms
-address = "geo.weather.gc.ca/geomet?service=WMS"  # for operational use # "http://collaboration.cmc.ec.gc.ca/rpn-wms" # for experimental use #
-Version = "1.3.0"
-wms = WebMapService('https://geo.weather.gc.ca/geomet?SERVICE=WMS' +
-                    '&REQUEST=GetCapabilities',
-                    version=Version,
-                    timeout=300)
+    pixel_value_dict_GDPS = {layer: request(layer, time_utc[:nb_timestep], coor) for layer in GDPS_varlist}
+    GDPS_df = pd.DataFrame.from_dict(pixel_value_dict_GDPS, orient='index').transpose()
+    GDPS_df['Date'] = time_local[:nb_timestep]
+    GDPS_df['GDPS.ETA_PR'] = GDPS_df['GDPS.ETA_PR'].diff()
+    GDPS_df['GDPS.ETA_N4'] = (GDPS_df['GDPS.ETA_N4'].diff() / 3600).clip(lower=0)
 
-# Setup the paths
-Path_To_Script = r"C:\Scripts\PycharmProjects\GetWeatherData\source\Forecasts"
-# Path_To_Script = os.getcwd()
-# Open file that contains path for station coordinates
-paths = list()
-with open(Path_To_Script + '\\Chemins_Acces.txt') as f:
-    lines = f.readlines()
-    for line in lines:
-        li = line.strip()
-        if not li.startswith("#"):
-            paths.append(line.split('\n')[0])
+    return GDPS_df
 
-InFile = paths[0]  # First line must be path + filename for station coordinates
-Path_Output = paths[1]  # Second line must be path for outputing station files
+# Function to get HRDPS data
+def run_HRDPS(coor: list, nb_timestep=None):
+    print('Getting HRDPS')
+    HRDPS_varlist = ['HRDPS.CONTINENTAL_TT', 'HRDPS.CONTINENTAL_HR', 'HRDPS.CONTINENTAL_PR', 'HRDPS.CONTINENTAL_N4']
+    time_local, time_utc = setup_time(HRDPS_varlist[0])
 
-RDPS_varlist = ['RDPS.ETA_TT', 'RDPS.ETA_HR', "RDPS.ETA_PR"]
-variables = ['TT', 'HR', 'PR']
-Forecast_Variables_List = ["AIRTEMP", "HR", "RAIN"]
+    pixel_value_dict_HRDPS = {layer: request(layer, time_utc[:nb_timestep], coor) for layer in HRDPS_varlist}
+    HRDPS_df = pd.DataFrame.from_dict(pixel_value_dict_HRDPS, orient='index').transpose()
+    HRDPS_df['Date'] = time_local[:nb_timestep]
+    HRDPS_df['HRDPS.CONTINENTAL_PR'] = HRDPS_df['HRDPS.CONTINENTAL_PR'].diff()
+    HRDPS_df['HRDPS.CONTINENTAL_N4'] = (HRDPS_df['HRDPS.CONTINENTAL_N4'].diff() / 3600).clip(lower=0)
 
-# Check if station file names exists or not (if it doesn't, make error message)
-try:
-    file = open(InFile)
-except Exception as e:
-    print('VStations file does not exist. Check the name of file or create a new one.')
+    return HRDPS_df
 
-# Start reading for all stations
-Stations_info = pd.read_csv(InFile, skiprows=2)
-# Create box with variables by getting 2nd longitude to the east and 2nd latitude to the north
-# Box order is the following : Lon1, Lat1, Lon2, Lat2
-Stations_info['Lon2'] = Stations_info['Lon'] + 0.1
-Stations_info['Lat2'] = Stations_info['Lat'] - 0.1
+def run_RDPS(coor: list, nb_timestep=None):
+    print('Getting RDPS')
+    RDPS_varlist = ['RDPS.ETA_TT', 'RDPS.ETA_HR', 'RDPS.ETA_PR','RDPS.ETA_N4']
+    time_local, time_utc = setup_time(RDPS_varlist[0])
 
-
-# Get RDPS
-def run_rdps(coor, nb_timestep=None):
-    # print("Requesting RDPS data...")
-    time_local, time_utc = get_forecast_times(RDPS_varlist[0])  # setup time as a base
-    pixel_value_dict_rdps = {layer: request(layer, time_utc[:nb_timestep],coor) for layer in RDPS_varlist}
+    pixel_value_dict_rdps = {layer: request(layer, time_utc[:nb_timestep], coor) for layer in RDPS_varlist}
     RDPS_df = pd.DataFrame.from_dict(pixel_value_dict_rdps, orient='index').transpose()
     RDPS_df['Date'] = time_local[:nb_timestep]
     RDPS_df['RDPS.ETA_PR'] = RDPS_df['RDPS.ETA_PR'].diff()
-    return RDPS_df
-def process_request(arg):
-    # print('Inside function')
-    # print(arg)
-    # Doesn't work with interpreter. Multprocess (which is supposed to work with interpreter) doesn't work
-    info = pd.DataFrame(arg).T
-    print(f'Acquiring weather forecast for {arg.iloc[0]}')
-    coor = (info[['Lon', 'Lat2', 'Lon2', 'Lat']].iloc[0].tolist())
-
-    # Can add nb_timesteps to define how far we want to go. Must add as function argument
-    nb_timestep = 24
-
-    RDPS_df = run_rdps(coor, nb_timestep)
-
+    RDPS_df['RDPS.ETA_N4'] = (RDPS_df['RDPS.ETA_N4'].diff() / 3600).clip(lower=0) # remove possible negative values
     return RDPS_df
 
-Stations_info.apply(process_request, axis=1)
+# Main processing function to get RDPS, GDPS, and HRDPS data for each station
+def process_request(station_info: pd.DataFrame, nb_timestep=24) -> dict:
+    '''
+    process_request is being applied on a pandas dataframe. Therefore the output will be a pd.series where each row is the forecast dictionnary
+
+    :param station_info:
+    :param nb_timestep:
+    :return:
+    '''
+    coor = [station_info['Lon'], station_info['Lat2'], station_info['Lon2'], station_info['Lat']]
+
+    HRDPS_df = run_HRDPS(coor, nb_timestep=48)
+    RDPS_df = run_RDPS(coor, nb_timestep=84)
+    GDPS_df = run_GDPS(coor, nb_timestep=120)
+
+    return {'RDPS': RDPS_df, 'GDPS': GDPS_df, 'HRDPS': HRDPS_df}
+
+def fill_missing_hours(df : pd.DataFrame, date_col : str) -> pd.DataFrame:
+    min_date = df[date_col].min()
+    max_date = df[date_col].max()
+
+    # Create a DatetimeIndex for every hour between min_date and max_date
+    full_index = pd.date_range(min_date, max_date, freq='H')
+
+    # Set the date column as the index of the dataframe
+    df = (df.set_index(date_col)
+          .reindex(full_index) # Reindex the dataframe using the full index, which fills in missing hours with NaNs
+          .reset_index()  # Reset the index so the date column is a regular column again
+          .rename(columns={'index':date_col})
+          )
+    return df
+
+def concatenate_forecasts(forecast_dict : dict) -> pd.DataFrame:
+    '''
+    Combine forecast data into a single uniform time series
+    :return: A single dataframe with all forecast data combined into a single time series
+    '''
+
+    # merge all three dataframes. Also check for any missing hours between min and max dates and if so, fill with nans
+    df_merged = (reduce(lambda left, right: pd.merge(left, right, on=['Date'], how='outer'), [forecast_dict['HRDPS'],forecast_dict['RDPS'],forecast_dict['GDPS']])
+             .pipe(fill_missing_hours,'Date'))
+
+    # Currently df_merged is a single dataframe, but it has different columns for every forecast.
+    # Create a list where each index is a specific variable (like PR) but it has all the different dataframes together
+    groups = [df_merged.columns[df_merged.columns.str[-2:].isin([suffix])] for suffix in common_var_names]
+
+    # Add new columns to df_merged, columns that are called from the list Forecast_Variables_List
+    for i in range(len(common_var_names)):
+        df_merged[forecast_variables[i]] = reduce(lambda left, right: left.combine_first(right),
+                                                       [df_merged[gr] for gr in groups[i]])
+
+    return df_merged[['Date'] + forecast_variables]
+
+def process_forecast():
+    pass
+    # Linear interpolation of missing values
 
 
-# def run_rdps(coor, nb_timestep=None):
-#     # print("Requesting RDPS data...")
-#     time_local, time_utc = get_forecast_times(RDPS_varlist[0])  # setup time as a base
-#     pixel_value_dict_rdps = {layer: request(layer, time_utc[:nb_timestep],coor) for layer in RDPS_varlist}
-#     RDPS_df = pd.DataFrame.from_dict(pixel_value_dict_rdps, orient='index').transpose()
-#     RDPS_df['Date'] = time_local[:nb_timestep]
-#     RDPS_df['RDPS.ETA_PR'] = RDPS_df['RDPS.ETA_PR'].diff()
-#     return RDPS_df
+def load_past_forecast(past_path: str, filename : str) -> pd.DataFrame:
+    '''
+    Only accepts csv files for now
+    #TODO : Add support for other file types
 
-# class BaseForecastSource:
-#     def fetch_data(self, layer, time, coordinates):
-#         raise NotImplementedError
-#     def transform_to_dataframe(self, parsed_data):
-#         raise NotImplementedError
-# class RDPSForecastSource(BaseForecastSource):
-#
-#     def __init__(self,nb_timestep=None,layer=None):
-#         self.nb_timestep = nb_timestep
-#         self.layer = layer
-#
-#     def fetch_data(self, layer, time, coordinates):
-#         time_local, time_utc = get_forecast_times(layer)  # setup time as a base
-#         self.time_local = time_local  # Storing for later use in transform_to_dataframe
-#         pixel_value_dict_rdps = {layer: request(layer, time_utc[:self.nb_timestep],coordinates) for layer in RDPS_varlist}
-#
-#     def transform_to_dataframe(self, pixel_value_dict_rdps):
-#         # RDPS-specific transformation logic
-#         time_local, time_utc = get_forecast_times(RDPS_varlist[0])  # setup time as a base
-#         RDPS_df = pd.DataFrame.from_dict(pixel_value_dict_rdps, orient='index').transpose()
-#         RDPS_df['Date'] = time_local[:self.nb_timestep]
-#         RDPS_df['RDPS.ETA_PR'] = RDPS_df['RDPS.ETA_PR'].diff()
+    :param path_input:
+    :param filename:
+    :return:
+    '''
+    try:
+        df = pd.read_csv(f"{past_path}\\{filename}.csv", sep=None,skiprows=1)
+        if len(df.columns) > 1:
+            print("Detected separator: comma")
+        else:
+            df = pd.read_csv(f"{past_path}\\{filename}.csv",sep=';',skiprows=1)
+            print("Detected separator: semicolon")
+    except FileNotFoundError:
+        print('No file found, returning empty dataframe with columns DATE and TIME')
+        df = pd.DataFrame(columns=['DATE', 'TIME'])  # return empty dataframe
+    return df
+
+def combine_past_and_current_forecast(past_df : pd.DataFrame, current_df : pd.DataFrame) -> pd.DataFrame:
+    pass
+
+# Save forecast within a csv file.
+def save_forecast(forecast_df:pd.DataFrame, save_path : str,filename : str):
+    print('Saving forecast to : ')
+    forecast_df.to_csv(f"{save_path}\\{filename}.csv", index=False, sep=';')
+
+import time
+start_time = time.time()
+
+# %% Read station information and process each station
+Path_To_Script = r"C:\Users\sebastien.durocher\PycharmProjects\GetWeatherData\source\Forecasts"
+InFile = os.path.join(Path_To_Script, 'VStations_test.dat')
+Stations_info = pd.read_csv(InFile, skiprows=2)
+Stations_info['Lon2'] = Stations_info['Lon'] + 0.1
+Stations_info['Lat2'] = Stations_info['Lat'] - 0.1
+
+results = Stations_info.apply(lambda row: process_request(row, nb_timestep=10), axis=1)
+# 'results' is a Series of dictionaries containing RDPS, GDPS, and HRDPS data for each station
+# Only works with one station value
+for forecast in results:
+    forecast_dataframe = concatenate_forecasts(forecast)
+    # process_forecast
+    # save_forecast()
+    # TODO : WHATS NEXT : INTERPOLATE MISING HOURS
+    forecast_dataframe = forecast_dataframe.interpolate()
+elapsed_time = time.time() - start_time

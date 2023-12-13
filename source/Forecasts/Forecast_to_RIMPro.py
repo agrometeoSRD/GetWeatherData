@@ -29,7 +29,7 @@ import pandas as pd
 
 # Define variables
 input_forecast_headers = ["AIRTEMP", "HR", "RAIN","GLOBALRAD"]
-rimpro_headers = ['DATE', 'TIME', 'AIRTEMP', 'AIRHUM', 'RAIN', 'GLOBALRAD']  # LW stands for leaf wetness
+rimpro_headers = ['DATE', 'TIME', 'AIRTEMP', 'AIRHUM', 'RAIN', 'GLOBALRAD'] # Note : DATE and TIME should not change
 
 
 # Convert to RIMPro format
@@ -46,8 +46,9 @@ def to_RIMpro_format(df):
     df_ForRIMpro[['DATE', 'TIME']] = df_ForRIMpro["Date"].astype(str).str.rsplit(' ', n=1,expand=True)  # expand date
     df_ForRIMpro = df_ForRIMpro[['DATE', 'TIME'] + input_forecast_headers]  # shift columns
     df_ForRIMpro.columns = rimpro_headers
+    df_ForRIMpro['DATE'] = df_ForRIMpro['DATE'].str.replace('-', '/')
 
-    # Convert columns to strings
+    # Convert all values to strings
     df_ForRIMpro = df_ForRIMpro.astype(str)
     return df_ForRIMpro
 
@@ -83,8 +84,6 @@ for index, station in Stations_info.iterrows():
     # convert to RIMpro format
     df = load_saved_csv(station['ID'], path_to_forecasts)
     df_ForRIMpro = (to_RIMpro_format(df)
-                    .assign(Date=lambda x: pd.to_datetime(x['DATE'] + ' ' + x['TIME']))
-                    .set_index('Date')
                     .replace('nan', np.nan)
                     .fillna(-991)) # replace any missing nans with -991 (The rimpro equivalent for nans)
 

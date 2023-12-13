@@ -39,8 +39,6 @@ from functools import reduce
 warnings.filterwarnings("ignore")
 
 # new imports
-import aiohttp
-import asyncio
 import pytz
 
 
@@ -115,59 +113,65 @@ def setup_time(layer):
     return time_local,time_utc
 
 # Function to get GDPS data
-def run_GDPS(coor: list, nb_timestep=None):
+def run_GDPS(coor: list, nb_timestep : dict):
     print('Getting GDPS')
     GDPS_varlist = ['GDPS.ETA_TT', 'GDPS.ETA_HR', 'GDPS.ETA_PR', 'GDPS.ETA_N4']
     time_local, time_utc = setup_time(GDPS_varlist[0])
 
-    pixel_value_dict_GDPS = {layer: request(layer, time_utc[:nb_timestep], coor) for layer in GDPS_varlist}
+    pixel_value_dict_GDPS = {layer: request(layer, time_utc[nb_timestep['RDPS']:nb_timestep['GDPS']], coor) for layer in GDPS_varlist}
     GDPS_df = pd.DataFrame.from_dict(pixel_value_dict_GDPS, orient='index').transpose()
-    GDPS_df['Date'] = time_local[:nb_timestep]
+    GDPS_df['Date'] = time_local[nb_timestep['RDPS']:nb_timestep['GDPS']]
     GDPS_df['GDPS.ETA_PR'] = GDPS_df['GDPS.ETA_PR'].diff()
     GDPS_df['GDPS.ETA_N4'] = (GDPS_df['GDPS.ETA_N4'].diff() / 3600).clip(lower=0)
 
     return GDPS_df
 
 # Function to get HRDPS data
-def run_HRDPS(coor: list, nb_timestep=None):
+def run_HRDPS(coor: list, nb_timestep : dict) -> pd.DataFrame:
     print('Getting HRDPS')
     HRDPS_varlist = ['HRDPS.CONTINENTAL_TT', 'HRDPS.CONTINENTAL_HR', 'HRDPS.CONTINENTAL_PR', 'HRDPS.CONTINENTAL_N4']
     time_local, time_utc = setup_time(HRDPS_varlist[0])
 
-    pixel_value_dict_HRDPS = {layer: request(layer, time_utc[:nb_timestep], coor) for layer in HRDPS_varlist}
+    pixel_value_dict_HRDPS = {layer: request(layer, time_utc[:nb_timestep['HRDPS']], coor) for layer in HRDPS_varlist}
     HRDPS_df = pd.DataFrame.from_dict(pixel_value_dict_HRDPS, orient='index').transpose()
-    HRDPS_df['Date'] = time_local[:nb_timestep]
+    HRDPS_df['Date'] = time_local[:nb_timestep['HRDPS']]
     HRDPS_df['HRDPS.CONTINENTAL_PR'] = HRDPS_df['HRDPS.CONTINENTAL_PR'].diff()
     HRDPS_df['HRDPS.CONTINENTAL_N4'] = (HRDPS_df['HRDPS.CONTINENTAL_N4'].diff() / 3600).clip(lower=0)
 
     return HRDPS_df
 
-def run_RDPS(coor: list, nb_timestep=None):
+def run_RDPS(coor: list, nb_timestep : dict):
     print('Getting RDPS')
     RDPS_varlist = ['RDPS.ETA_TT', 'RDPS.ETA_HR', 'RDPS.ETA_PR','RDPS.ETA_N4']
     time_local, time_utc = setup_time(RDPS_varlist[0])
 
-    pixel_value_dict_rdps = {layer: request(layer, time_utc[:nb_timestep], coor) for layer in RDPS_varlist}
+    pixel_value_dict_rdps = {layer: request(layer, time_utc[nb_timestep['HRDPS']:nb_timestep['RDPS']], coor) for layer in RDPS_varlist}
     RDPS_df = pd.DataFrame.from_dict(pixel_value_dict_rdps, orient='index').transpose()
-    RDPS_df['Date'] = time_local[:nb_timestep]
+    RDPS_df['Date'] = time_local[nb_timestep['HRDPS']:nb_timestep['RDPS']]
     RDPS_df['RDPS.ETA_PR'] = RDPS_df['RDPS.ETA_PR'].diff()
     RDPS_df['RDPS.ETA_N4'] = (RDPS_df['RDPS.ETA_N4'].diff() / 3600).clip(lower=0) # remove possible negative values
     return RDPS_df
 
 # Main processing function to get RDPS, GDPS, and HRDPS data for each station
-def process_request(station_info: pd.DataFrame, nb_timestep=24) -> dict:
+def process_request(station_info: pd.DataFrame) -> dict:
     '''
     process_request is being applied on a pandas dataframe. Therefore the output will be a pd.series where each row is the forecast dictionnary
+
+    Added intelligent timestep pacing for each forecast.
+    Meaning RDPS will only count times after HRDPS and GDPS will only count times after RDPS. HRDPS starts counting from the beggining.
+    To change the number of timesteps for each forecast, change the timesteps_dict variable
 
     :param station_info:
     :param nb_timestep:
     :return:
     '''
+    print(f'Acquiring forecast for station : {station_info["Name"]}')
     coor = [station_info['Lon'], station_info['Lat2'], station_info['Lon2'], station_info['Lat']]
+    timesteps_dict = {'HRDPS': 48,'RDPS': 84, 'GDPS': 120} # default values should be : 48, 84 and 120
 
-    HRDPS_df = run_HRDPS(coor, nb_timestep=48)
-    RDPS_df = run_RDPS(coor, nb_timestep=84)
-    GDPS_df = run_GDPS(coor, nb_timestep=120)
+    HRDPS_df = run_HRDPS(coor, nb_timestep=timesteps_dict)
+    RDPS_df = run_RDPS(coor, nb_timestep=timesteps_dict)
+    GDPS_df = run_GDPS(coor, nb_timestep=timesteps_dict)
 
     return {'RDPS': RDPS_df, 'GDPS': GDPS_df, 'HRDPS': HRDPS_df}
 
@@ -238,26 +242,30 @@ def combine_past_and_current_forecast(past_df : pd.DataFrame, current_df : pd.Da
 
 # Save forecast within a csv file.
 def save_forecast(forecast_df:pd.DataFrame, save_path : str,filename : str):
-    print('Saving forecast to : ')
-    forecast_df.to_csv(f"{save_path}\\{filename}.csv", index=False, sep=';')
+    out = f"{save_path}\\{filename}.csv"
+    print(f'Saving forecast to : {out}')
+    forecast_df.to_csv(f"{out}", index=False, sep=';')
 
 import time
 start_time = time.time()
 
 # %% Read station information and process each station
-Path_To_Script = r"C:\Users\sebastien.durocher\PycharmProjects\GetWeatherData\source\Forecasts"
-InFile = os.path.join(Path_To_Script, 'VStations_test.dat')
+path_to_script = r"C:\Scripts\PycharmProjects\GetWeatherData\source\Forecasts"
+path_to_save = r"C:\Scripts\PycharmProjects\GetWeatherData\source\Forecasts\saved_forecasts"
+InFile = os.path.join(path_to_script, 'VStations_test.dat')
 Stations_info = pd.read_csv(InFile, skiprows=2)
 Stations_info['Lon2'] = Stations_info['Lon'] + 0.1
 Stations_info['Lat2'] = Stations_info['Lat'] - 0.1
 
-results = Stations_info.apply(lambda row: process_request(row, nb_timestep=10), axis=1)
+results = Stations_info.apply(lambda row: process_request(row), axis=1)
+i = 0
 # 'results' is a Series of dictionaries containing RDPS, GDPS, and HRDPS data for each station
 # Only works with one station value
 for forecast in results:
     forecast_dataframe = concatenate_forecasts(forecast)
     # process_forecast
-    # save_forecast()
-    # TODO : WHATS NEXT : INTERPOLATE MISING HOURS
-    forecast_dataframe = forecast_dataframe.interpolate()
+    forecast_dataframe = forecast_dataframe.interpolate() # fill missing hours
+    # save forecast
+    save_forecast(forecast_dataframe,path_to_save,filename=f'{Stations_info.loc[i,"ID"]}_saved_forecast')
+    i += 1
 elapsed_time = time.time() - start_time

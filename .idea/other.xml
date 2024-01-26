@@ -4,5 +4,6 @@
     <option name="PY_SCI_VIEW" value="true" />
     <option name="PY_SCI_VIEW_SUGGESTED" value="true" />
     <option name="PY_MATPLOTLIB_IN_TOOLWINDOW" value="false" />
+    <option name="PY_INTERACTIVE_PLOTS" value="false" />
   </component>
 </project>

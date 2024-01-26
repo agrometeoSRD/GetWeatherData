@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/GetWeatherData.iml" filepath="$PROJECT_DIR$/.idea/GetWeatherData.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../WUndergroundPWS-API/.idea/WUndergroundPWS-API.iml" filepath="$PROJECT_DIR$/../WUndergroundPWS-API/.idea/WUndergroundPWS-API.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../wunderground-pws/.idea/wunderground-pws.iml" filepath="$PROJECT_DIR$/../wunderground-pws/.idea/wunderground-pws.iml" />
     </modules>
   </component>
 </project>

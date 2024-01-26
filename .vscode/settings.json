@@ -1,0 +1,16 @@
+{
+    "python.terminal.launchArgs": [],
+    "terminal.integrated.profiles.windows": {
+        "Conda GetWeatherData (cmd)": {
+            "path": "cmd.exe",
+            "icon": "terminal-cmd",
+            "args": [
+                "/k", "C:\\Users\\sebastien.durocher\\AppData\\Local\\miniconda3\\Scripts\\activate.bat && conda activate GetWeatherData"
+            ]
+        }
+    },
+    "terminal.integrated.defaultProfile.windows": "Conda GetWeatherData (cmd)",
+    
+}
+
+

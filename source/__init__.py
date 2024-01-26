@@ -10,7 +10,7 @@ Notes:
 """
 
 from .Observations.NRCAN import get_nrcan
-from .Observations.Daymet import Get_Daymet_Area
+from .Observations.Daymet import Get_Daymet_Area_Old
 from .Reanalyses.ERA5 import era5_from_pavics
 from .Reanalyses.RDRS import rdrs_from_pavics
 

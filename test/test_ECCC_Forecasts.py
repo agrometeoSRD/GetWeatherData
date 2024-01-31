@@ -5,6 +5,10 @@ Email: sebastien.rougerie-durocher@irda.qc.ca
 Github: https://github.com/MorningGlory747
 Description: This is a description of what the script does
 Created: 2024-01-30
+
+NOTE : THIS WAS A TEST FILE TO UNDERSTAND HOW TO WRITE TESTS IN PYTHON. NOT ACTUALLY WORTH USING
+- It actually doesn't work because : we don't know how the dataframe of combine_past_and_current will look like. The output is non-deterministic.
+- The below function expects hard-coded output of the function, which is not the case.
 """
 
 # Import statements
@@ -72,6 +76,12 @@ class TestCombinePastAndCurrentForecast(unittest.TestCase):
         result_df = combine_past_and_current_forecast(self.past_df, different_df, self.date_col)
         assert_frame_equal(result_df, different_df)
 
+    def test_combine_past_and_current_forecast_when_no_overlapping_dates(self):
+        pass
+
+    def test_for_nulls(self):
+        # edge case for when there is null value in the data
+        pass
 
 # Main execution ---------------------------------------
 

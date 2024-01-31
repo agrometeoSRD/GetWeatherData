@@ -8,12 +8,72 @@ Created: 2024-01-30
 """
 
 # Import statements
+import unittest
+from source.Forecasts.ECCC_Forecasts import combine_past_and_current_forecast
+import pandas as pd
+from pandas.testing import assert_frame_equal
 
 # Constants
 
 # Functions
+# TODO : Learn about what is test coverage and how to use it
+#TODO : Test the function combine_past_and_current_forecast
+class TestCombinePastAndCurrentForecast(unittest.TestCase):
+    def setUp(self):
+        self.date_col = 'Date'
+        self.forecast_variables = ["AIRTEMP [C]", "HR [%]", "RAIN [mm]", "GLOBALRAD [Wm2]"]
+        self.past_df = pd.DataFrame({
+            self.date_col: pd.date_range(start='1/1/2022', periods=3),
+            self.forecast_variables[0]: [1, 2, 3],
+            self.forecast_variables[1]: [4, 5, 6],
+            self.forecast_variables[2]: [7, 8, 9],
+            self.forecast_variables[3]: [10, 11, 12]
+        })
+        self.current_df = pd.DataFrame({
+            self.date_col: pd.date_range(start='1/2/2022', periods=3),
+            self.forecast_variables[0]: [13, 14, 15],
+            self.forecast_variables[1]: [16, 17, 18],
+            self.forecast_variables[2]: [19, 20, 21],
+            self.forecast_variables[3]: [22, 23, 24]
+        })
+
+    def test_combine_past_and_current_forecast_happy_path(self):
+        expected_df = pd.DataFrame({
+            self.date_col: pd.date_range(start='1/1/2022', periods=4),
+            self.forecast_variables[0]: [1, 13, 14, 15],
+            self.forecast_variables[1]: [4, 16, 17, 18],
+            self.forecast_variables[2]: [7, 0, 20, 21],
+            self.forecast_variables[3]: [10, 22, 23, 24]
+        })
+        result_df = combine_past_and_current_forecast(self.past_df, self.current_df, self.date_col)
+        assert_frame_equal(result_df, expected_df)
+
+    def test_combine_past_and_current_forecast_when_past_df_is_empty(self):
+        empty_df = pd.DataFrame()
+        result_df = combine_past_and_current_forecast(empty_df, self.current_df, self.date_col)
+        assert_frame_equal(result_df, self.current_df)
+
+    def test_combine_past_and_current_forecast_when_current_df_is_empty(self):
+        empty_df = pd.DataFrame()
+        result_df = combine_past_and_current_forecast(self.past_df, empty_df, self.date_col)
+        assert_frame_equal(result_df, self.past_df)
+
+    def test_combine_past_and_current_forecast_when_both_dfs_are_empty(self):
+        empty_df = pd.DataFrame()
+        expected_df = pd.DataFrame(columns=[self.date_col] + self.forecast_variables)
+        result_df = combine_past_and_current_forecast(empty_df, empty_df, self.date_col)
+        assert_frame_equal(result_df, expected_df)
+
+    def test_combine_past_and_current_forecast_when_dfs_have_different_columns(self):
+        different_df = pd.DataFrame({
+            self.date_col: pd.date_range(start='1/2/2022', periods=3),
+            'Different_Column': [25, 26, 27]
+        })
+        result_df = combine_past_and_current_forecast(self.past_df, different_df, self.date_col)
+        assert_frame_equal(result_df, different_df)
+
 
 # Main execution ---------------------------------------
 
 if __name__ == "__main__":
-    pass
+    unittest.main() # This will run all the tests when script is executed

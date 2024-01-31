@@ -1,5 +1,5 @@
-#%%
-#!/usr/bin/env
+# %%
+# !/usr/bin/env
 """
 Creation date: 2023-03-29
 Creator : sebastien durocher
@@ -14,43 +14,49 @@ Updates:
 Notes:
     - Unlike all past iterations of getting forecast, now the forecast script doesn't transform the data into RIMpro format
     - This only works for eastern time zones
+    - Precipitaiton :
+        - Raw precipitation is in kg/m2, but assuming density of water to be 1kg/L, this gives us a 1:1 translation into mm
+        - Raw precipitaiton is also cumulative. Subtract by previous hour to get hourly precipitaiton
+
+    - CSV output should have the following structure
+    DATE AIRTEMP HR RAIN GLOBALRAD
+    2022-02-24 23:00:00 -12.291052 65.531517 0.0 50
+
 """
-#TODO : Create automatic file to get acces to station data. Add the necessary errors to make sure the data is there
-#TODO : Test fonctions for anomalous data
-#TODO : Test forecast with multiple stations
-#TODO : Create a seperate script that would accept the forecast data and convert it into RIMpro
-#TODO : Apply asyncio to the script
-#TODO : Create some kind of secondary dictionnary that associates each variable with its corresponding forecast variable, that way the user can easily specify the variables that he wants and then the code will get the corresponding layers
-#TODO : Find some way to incorporate a percentage progress bar
+# TODO : Create automatic file to get acces to station data. Add the necessary errors to make sure the data is there
+# TODO : Test fonctions for anomalous data
+# TODO : Test forecast with multiple stations
+# TODO : Create a seperate script that would accept the forecast data and convert it into RIMpro
+# TODO : Apply asyncio to the script
+# TODO : Create some kind of secondary dictionnary that associates each variable with its corresponding forecast variable, that way the user can easily specify the variables that he wants and then the code will get the corresponding layers
+# TODO : Find some way to incorporate a percentage progress bar
 
 # imports
 import os
 import re
 import warnings
 from datetime import datetime, timedelta
-from dateutil import tz
-
-import numpy as np
+from functools import reduce
+import time
+import pytz
 import pandas as pd
 from owslib.util import ServiceException
 from owslib.wms import WebMapService
-from functools import reduce
 
 warnings.filterwarnings("ignore")
 
-# new imports
-import pytz
 
-
-#%% Testing out chatgpt stuff
+# %% Testing out chatgpt stuff
+# constants
 # Function to request weather data for a given layer, time, and coordinates
 wms_url = 'https://geo.weather.gc.ca/geomet/?SERVICE=WMS&REQUEST=GetFeatureInfo'
-wms = WebMapService(wms_url , version='1.3.0', timeout=300)
-common_var_names = ['TT', 'HR', 'PR', 'N4'] # These are the common variable names between the different forecast models
-forecast_variables = ["AIRTEMP", "HR", "RAIN","GLOBALRAD"] # This is the desired variable names for the final dataframe
+wms = WebMapService(wms_url, version='1.3.0', timeout=300)
+common_var_names = ['TT', 'HR', 'PR', 'N4']  # These are the common variable names between the different forecast models
+forecast_variables = ["AIRTEMP [C]", "HR [%]", "RAIN [mm]",
+                      "GLOBALRAD [Wm2]"]  # This is the desired variable names for the final dataframe
+
 
 def request(layer: str, times: list, coor: list) -> list:
-
     pixel_values = []
     for timestep in times:
         try:
@@ -77,6 +83,7 @@ def request(layer: str, times: list, coor: list) -> list:
             pixel_values.append(float('nan'))
 
     return pixel_values
+
 
 # Extraction of temporal information from metadata
 def time_parameters(layer):
@@ -110,51 +117,57 @@ def setup_time(layer):
     # Convert time to local time zone
     time_local = [t.replace(tzinfo=pytz.utc).astimezone(au_tz).replace(tzinfo=None) for t in time_utc]
 
-    return time_local,time_utc
+    return time_local, time_utc
+
 
 # Function to get GDPS data
-def run_GDPS(coor: list, nb_timestep : dict):
+def run_gdps(coor: list, nb_timestep: dict,date_col:str):
     print('Getting GDPS')
     GDPS_varlist = ['GDPS.ETA_TT', 'GDPS.ETA_HR', 'GDPS.ETA_PR', 'GDPS.ETA_N4']
     time_local, time_utc = setup_time(GDPS_varlist[0])
 
-    pixel_value_dict_GDPS = {layer: request(layer, time_utc[nb_timestep['RDPS']:nb_timestep['GDPS']], coor) for layer in GDPS_varlist}
-    GDPS_df = pd.DataFrame.from_dict(pixel_value_dict_GDPS, orient='index').transpose()
-    GDPS_df['Date'] = time_local[nb_timestep['RDPS']:nb_timestep['GDPS']]
-    GDPS_df['GDPS.ETA_PR'] = GDPS_df['GDPS.ETA_PR'].diff()
-    GDPS_df['GDPS.ETA_N4'] = (GDPS_df['GDPS.ETA_N4'].diff() / 3600).clip(lower=0)
+    pixel_value_dict_GDPS = {layer: request(layer, time_utc[nb_timestep['RDPS']:nb_timestep['GDPS']], coor) for layer in
+                             GDPS_varlist}
+    gdps_df = pd.DataFrame.from_dict(pixel_value_dict_GDPS, orient='index').transpose()
+    gdps_df[date_col] = time_local[nb_timestep['RDPS']:nb_timestep['GDPS']]
+    gdps_df['GDPS.ETA_PR'] = gdps_df['GDPS.ETA_PR'].diff()
+    gdps_df['GDPS.ETA_N4'] = (gdps_df['GDPS.ETA_N4'].diff() / 3600).clip(lower=0)
 
-    return GDPS_df
+    return gdps_df
+
 
 # Function to get HRDPS data
-def run_HRDPS(coor: list, nb_timestep : dict) -> pd.DataFrame:
+def run_hrdps(coor: list, nb_timestep: dict,date_col:str) -> pd.DataFrame:
     print('Getting HRDPS')
     HRDPS_varlist = ['HRDPS.CONTINENTAL_TT', 'HRDPS.CONTINENTAL_HR', 'HRDPS.CONTINENTAL_PR', 'HRDPS.CONTINENTAL_N4']
     time_local, time_utc = setup_time(HRDPS_varlist[0])
 
     pixel_value_dict_HRDPS = {layer: request(layer, time_utc[:nb_timestep['HRDPS']], coor) for layer in HRDPS_varlist}
-    HRDPS_df = pd.DataFrame.from_dict(pixel_value_dict_HRDPS, orient='index').transpose()
-    HRDPS_df['Date'] = time_local[:nb_timestep['HRDPS']]
-    HRDPS_df['HRDPS.CONTINENTAL_PR'] = HRDPS_df['HRDPS.CONTINENTAL_PR'].diff()
-    HRDPS_df['HRDPS.CONTINENTAL_N4'] = (HRDPS_df['HRDPS.CONTINENTAL_N4'].diff() / 3600).clip(lower=0)
+    hrdps_df = pd.DataFrame.from_dict(pixel_value_dict_HRDPS, orient='index').transpose()
+    hrdps_df[date_col] = time_local[:nb_timestep['HRDPS']]
+    hrdps_df['HRDPS.CONTINENTAL_PR'] = hrdps_df['HRDPS.CONTINENTAL_PR'].diff()
+    hrdps_df['HRDPS.CONTINENTAL_N4'] = (hrdps_df['HRDPS.CONTINENTAL_N4'].diff() / 3600).clip(lower=0)
 
-    return HRDPS_df
+    return hrdps_df
 
-def run_RDPS(coor: list, nb_timestep : dict):
+
+def run_rdps(coor: list, nb_timestep: dict,date_col:str):
     print('Getting RDPS')
-    RDPS_varlist = ['RDPS.ETA_TT', 'RDPS.ETA_HR', 'RDPS.ETA_PR','RDPS.ETA_N4']
+    RDPS_varlist = ['RDPS.ETA_TT', 'RDPS.ETA_HR', 'RDPS.ETA_PR', 'RDPS.ETA_N4']
     time_local, time_utc = setup_time(RDPS_varlist[0])
 
-    pixel_value_dict_rdps = {layer: request(layer, time_utc[nb_timestep['HRDPS']:nb_timestep['RDPS']], coor) for layer in RDPS_varlist}
-    RDPS_df = pd.DataFrame.from_dict(pixel_value_dict_rdps, orient='index').transpose()
-    RDPS_df['Date'] = time_local[nb_timestep['HRDPS']:nb_timestep['RDPS']]
-    RDPS_df['RDPS.ETA_PR'] = RDPS_df['RDPS.ETA_PR'].diff()
-    RDPS_df['RDPS.ETA_N4'] = (RDPS_df['RDPS.ETA_N4'].diff() / 3600).clip(lower=0) # remove possible negative values
-    return RDPS_df
+    pixel_value_dict_rdps = {layer: request(layer, time_utc[nb_timestep['HRDPS']:nb_timestep['RDPS']], coor) for layer
+                             in RDPS_varlist}
+    rdps_df = pd.DataFrame.from_dict(pixel_value_dict_rdps, orient='index').transpose()
+    rdps_df[date_col] = time_local[nb_timestep['HRDPS']:nb_timestep['RDPS']]
+    rdps_df['RDPS.ETA_PR'] = rdps_df['RDPS.ETA_PR'].diff()
+    rdps_df['RDPS.ETA_N4'] = (rdps_df['RDPS.ETA_N4'].diff() / 3600).clip(lower=0)  # remove possible negative values
+    return rdps_df
+
 
 # Main processing function to get RDPS, GDPS, and HRDPS data for each station
-def process_request(station_info: pd.DataFrame) -> dict:
-    '''
+def process_request(station_info: pd.DataFrame,date_col:str) -> dict:
+    """
     process_request is being applied on a pandas dataframe. Therefore the output will be a pd.series where each row is the forecast dictionnary
 
     Added intelligent timestep pacing for each forecast.
@@ -164,18 +177,19 @@ def process_request(station_info: pd.DataFrame) -> dict:
     :param station_info:
     :param nb_timestep:
     :return:
-    '''
+    """
     print(f'Acquiring forecast for station : {station_info["Name"]}')
     coor = [station_info['Lon'], station_info['Lat2'], station_info['Lon2'], station_info['Lat']]
-    timesteps_dict = {'HRDPS': 48,'RDPS': 84, 'GDPS': 120} # default values should be : 48, 84 and 120
+    timesteps_dict = {'HRDPS': 48, 'RDPS': 84, 'GDPS': 120}  # default values should be : 48, 84 and 120
 
-    HRDPS_df = run_HRDPS(coor, nb_timestep=timesteps_dict)
-    RDPS_df = run_RDPS(coor, nb_timestep=timesteps_dict)
-    GDPS_df = run_GDPS(coor, nb_timestep=timesteps_dict)
+    hrdps_df = run_hrdps(coor,timesteps_dict, date_col)
+    rdps_df = run_rdps(coor,timesteps_dict, date_col)
+    gdps_df = run_gdps(coor,timesteps_dict, date_col)
 
-    return {'RDPS': RDPS_df, 'GDPS': GDPS_df, 'HRDPS': HRDPS_df}
+    return {'RDPS': rdps_df, 'GDPS': gdps_df, 'HRDPS': hrdps_df}
 
-def fill_missing_hours(df : pd.DataFrame, date_col : str) -> pd.DataFrame:
+
+def fill_missing_hours(df: pd.DataFrame, date_col: str) -> pd.DataFrame:
     min_date = df[date_col].min()
     max_date = df[date_col].max()
 
@@ -184,21 +198,23 @@ def fill_missing_hours(df : pd.DataFrame, date_col : str) -> pd.DataFrame:
 
     # Set the date column as the index of the dataframe
     df = (df.set_index(date_col)
-          .reindex(full_index) # Reindex the dataframe using the full index, which fills in missing hours with NaNs
+          .reindex(full_index)  # Reindex the dataframe using the full index, which fills in missing hours with NaNs
           .reset_index()  # Reset the index so the date column is a regular column again
-          .rename(columns={'index':date_col})
+          .rename(columns={'index': date_col})
           )
     return df
 
-def concatenate_forecasts(forecast_dict : dict) -> pd.DataFrame:
-    '''
+
+def concatenate_forecasts(forecast_dict: dict,date_col:str) -> pd.DataFrame:
+    """
     Combine forecast data into a single uniform time series
     :return: A single dataframe with all forecast data combined into a single time series
-    '''
+    """
 
     # merge all three dataframes. Also check for any missing hours between min and max dates and if so, fill with nans
-    df_merged = (reduce(lambda left, right: pd.merge(left, right, on=['Date'], how='outer'), [forecast_dict['HRDPS'],forecast_dict['RDPS'],forecast_dict['GDPS']])
-             .pipe(fill_missing_hours,'Date'))
+    df_merged = (reduce(lambda left, right: pd.merge(left, right, on=['Date'], how='outer'),
+                        [forecast_dict['HRDPS'], forecast_dict['RDPS'], forecast_dict['GDPS']])
+                 .pipe(fill_missing_hours, date_col))
 
     # Currently df_merged is a single dataframe, but it has different columns for every forecast.
     # Create a list where each index is a specific variable (like PR) but it has all the different dataframes together
@@ -207,65 +223,184 @@ def concatenate_forecasts(forecast_dict : dict) -> pd.DataFrame:
     # Add new columns to df_merged, columns that are called from the list Forecast_Variables_List
     for i in range(len(common_var_names)):
         df_merged[forecast_variables[i]] = reduce(lambda left, right: left.combine_first(right),
-                                                       [df_merged[gr] for gr in groups[i]])
+                                                  [df_merged[gr] for gr in groups[i]])
 
-    return df_merged[['Date'] + forecast_variables]
-
-def process_forecast():
-    pass
-    # Linear interpolation of missing values
+    return df_merged[[date_col] + forecast_variables]
 
 
-def load_past_forecast(past_path: str, filename : str) -> pd.DataFrame:
-    '''
-    Only accepts csv files for now
+def fill_missing_hours(df, date_col):
+    min_date = df[date_col].min()
+    max_date = df[date_col].max()
+
+    # Create a DatetimeIndex for every hour between min_date and max_date
+    full_index = pd.date_range(min_date, max_date, freq='H')
+
+    # Set the date column as the index of the dataframe
+    df = (df.set_index(date_col)
+          .reindex(full_index)  # Reindex the dataframe using the full index, which fills in missing hours with NaNs
+          .reset_index()  # Reset the index so the date column is a regular column again
+          .rename(columns={'index': date_col})
+          )
+
+    # interpolate missing hours (backfill)
+    df = df.interpolate()  # fill missing hours
+    return df
+
+
+def load_past_forecast(past_path: str, filename: str, date_col:str) -> pd.DataFrame:
+    """
+    Only accepts csv files for now.
+    csv should have an expected one row of header that will be skipped
     #TODO : Add support for other file types
+    #TODO : Add condition if we skip a an uncessary header (like if no header, or if two headers)
 
     :param path_input:
     :param filename:
     :return:
-    '''
-    try:
-        df = pd.read_csv(f"{past_path}\\{filename}.csv", sep=None,skiprows=1)
+    """
+
+    # check if file exists. If it doesn'T return as empty dataframe
+    filename = f"{past_path}\\{filename}.csv"
+    if not os.path.isfile(filename):
+        print('No file found, returning empty dataframe with columns DATE and TIME')
+        return pd.DataFrame(columns=[date_col] + forecast_variables)
+    else:
+        df = pd.read_csv(filename, sep=None)
         if len(df.columns) > 1:
             print("Detected separator: comma")
         else:
-            df = pd.read_csv(f"{past_path}\\{filename}.csv",sep=';',skiprows=1)
+            df = pd.read_csv(f"{past_path}\\{filename}.csv", sep=';')
             print("Detected separator: semicolon")
-    except FileNotFoundError:
-        print('No file found, returning empty dataframe with columns DATE and TIME')
-        df = pd.DataFrame(columns=['DATE', 'TIME'])  # return empty dataframe
     return df
 
-def combine_past_and_current_forecast(past_df : pd.DataFrame, current_df : pd.DataFrame) -> pd.DataFrame:
+
+def combine_past_and_current_forecast(past_df: pd.DataFrame, current_df: pd.DataFrame,date_col:str) -> pd.DataFrame:
+    # The function should work under the following conditions:
+    # 1) If past_df is empty, return current_df
+    # 2) if current_df is empty, return past_df
+    # 3) if both dataframes are empty, return an empty dataframe
+    # 4) if past_df exists, but the dataframe does not match current_df, return current_df
+    # 5) if past_df exists, but the time forecast has nothing in common with current_df, return current_df
+    # 6) if past_df exists and has time forecast that overlap with current_df, then combine the two dataframes but make sure current_df has priority
+
+    # Condition 1 : If past_df is empty, return current_df
+    if past_df.empty:
+        return current_df
+
+    # Condition 2 : If current_df is empty, return past_df
+    if current_df.empty:
+        return past_df
+
+    # Condition 3 : If both dataframes are empty, return an empty dataframe
+    if past_df.empty and current_df.empty:
+        return pd.DataFrame(columns=[date_col] + forecast_variables)
+
+    # Condition 4 : Ensure both dataframes have the same columns
+    if set(past_df.columns) != set(current_df.columns):
+        print('Columns are not the same, returning current forecast as the only appropriate forecast')
+        return current_df
+
+    # todo : missing answer for condition 5
+
+    # Condition 6
+    # Sort dataframes by date in descending order
+    past_df = past_df.sort_values(by=date_col, ascending=False)
+    current_df = current_df.sort_values(by=date_col, ascending=False)
+
+    # initial forecast hour of current_df has nan for rain (because of .diff() done previously)
+    # will try to fill it with the last forecast hour of past_df
+    # the following conditions must therefore be met :
+    # Condition 6a. past_df does not have the corresponding time of current_df. If so, simply give value 0 to rain
+    # Condition 6b. past_df has corresponding time of current_df, but value is nan. If so, simply give value 0 to rain
+    # Condition 6c. past_df has corresponding time of current and a value. If so, give that value to current_df
+    # Condition 6a. Check matching hours
+    if not past_df[date_col].isin([current_df[date_col].iloc[0]]).any():
+        current_df.loc[(current_df[date_col] == current_df[date_col].iloc[0]), 'RAIN'] = 0
+    # Condition 6b. Check nan value
+    if past_df.loc[(past_df[date_col] == current_df[date_col].iloc[0]), 'RAIN'].isna().any():
+        current_df.loc[(current_df[date_col] == current_df[date_col].iloc[0]), 'RAIN'] = 0
+    # Condition 6c. Replace value
+    else :
+        current_df.loc[(current_df[date_col] == current_df[date_col].iloc[0]), 'RAIN'] = past_df.loc[(past_df[date_col] == current_df[date_col].iloc[0]), 'RAIN'].iloc[0]
+
+    # Combine dataframes, prioritizing current forecast
+    combined_df = current_df.combine_first(past_df)
+
+    # Sort by date in ascending order
+    combined_df = combined_df.sort_values(by=date_col)
+
+    return combined_df
+
+def sanity_check(df: pd.DataFrame):
+    # check to make sure the dataframe has the right columns
+
+    # check to make sure the values are within the right range
+
     pass
 
 # Save forecast within a csv file.
-def save_forecast(forecast_df:pd.DataFrame, save_path : str,filename : str):
+def save_forecast(forecast_df: pd.DataFrame, save_path: str, filename: str):
     out = f"{save_path}\\{filename}.csv"
     print(f'Saving forecast to : {out}')
     forecast_df.to_csv(f"{out}", index=False, sep=';')
 
-import time
-start_time = time.time()
 
 # %% Read station information and process each station
-path_to_script = r"C:\Scripts\PycharmProjects\GetWeatherData\source\Forecasts"
-path_to_save = r"C:\Scripts\PycharmProjects\GetWeatherData\source\Forecasts\saved_forecasts"
-InFile = os.path.join(path_to_script, 'VStations_test.dat')
-Stations_info = pd.read_csv(InFile, skiprows=2)
-Stations_info['Lon2'] = Stations_info['Lon'] + 0.1
-Stations_info['Lat2'] = Stations_info['Lat'] - 0.1
+import logging
+import configparser
+from pathlib import Path
 
-results = Stations_info.apply(lambda row: process_request(row), axis=1)
-i = 0
-# 'results' is a Series of dictionaries containing RDPS, GDPS, and HRDPS data for each station
-# Only works with one station value
-for forecast in results:
-    forecast_dataframe = concatenate_forecasts(forecast)
-    # process_forecast
-    forecast_dataframe = forecast_dataframe.interpolate() # fill missing hours
-    # save forecast
-    save_forecast(forecast_dataframe,path_to_save,filename=f'{Stations_info.loc[i,"ID"]}_saved_forecast')
-    i += 1
-elapsed_time = time.time() - start_time
+def main(config_path):
+    start_time = time.time()
+
+    # Set up logging
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    logger = logging.getLogger(__name__)
+
+    # Load configuration
+    config = configparser.ConfigParser()
+    config.read(config_path)
+
+    path_to_script = config.get('Paths', 'ScriptPath')
+    path_to_save = config.get('Paths', 'SavePath')
+    date_col = config.get('General', 'DateColumn')
+
+    # Load station info
+    InFile = os.path.join(path_to_script, 'VStations_test.dat')
+    try:
+        Stations_info = pd.read_csv(InFile, skiprows=2)
+    except Exception as e:
+        logger.error(f"Error reading file {InFile}: {e}")
+        return
+
+    # Additional processing
+    Stations_info['Lon2'] = Stations_info['Lon'] + 0.1
+    Stations_info['Lat2'] = Stations_info['Lat'] - 0.1
+
+    InFile = os.path.join(path_to_script, 'VStations_test.dat')
+    Stations_info = pd.read_csv(InFile, skiprows=2)
+    Stations_info['Lon2'] = Stations_info['Lon'] + 0.1
+    Stations_info['Lat2'] = Stations_info['Lat'] - 0.1
+
+    # Process each station
+    for i, row in Stations_info.iterrows():
+        try:
+            forecast = process_request(row,date_col)
+            forecast_dataframe = concatenate_forecasts(forecast)
+            past_forecast = load_past_forecast(path_to_save, f'{row["ID"]}_saved_forecast', date_col)
+            forecast_dataframe = combine_past_and_current_forecast(past_forecast, forecast_dataframe, date_col)
+            forecast_dataframe = fill_missing_hours(forecast_dataframe, date_col)
+            save_forecast(forecast_dataframe, path_to_save, f'{row["ID"]}_saved_forecast')
+        except Exception as e:
+            logger.error(f"Error processing station {row['ID']}: {e}")
+
+        # Log progress
+        logger.info(f"Processed station {row['ID']}")
+
+    elapsed_time = time.time() - start_time
+    logger.info(f"Script completed in {elapsed_time} seconds")
+
+if __name__ == "__main__":
+    # Define path to configuration file
+    config_file_path = f'C:\\Users\\{os.getenv("USERNAME")}\\PycharmProjects\\GetWeatherData\\source\\Forecasts\\config.ini'
+    main(config_file_path)

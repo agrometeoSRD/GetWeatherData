@@ -14,9 +14,17 @@ Updates:
 Notes:
     - Unlike all past iterations of getting forecast, now the forecast script doesn't transform the data into RIMpro format
     - This only works for eastern time zones
-    - Precipitaiton :
+    - Precipitaiton (PR TO RAIN) :
         - Raw precipitation is in kg/m2, but assuming density of water to be 1kg/L, this gives us a 1:1 translation into mm
         - Raw precipitaiton is also cumulative. Subtract by previous hour to get hourly precipitaiton
+
+    - Solar radiation (N4 to GLOBALRAD) :
+        - Raw solar radiation is in J/m2. To conver to W/m2, divide by 3600 (for seconds) (divide by 3*3600 for GDPS cause dt = 3 hours)
+        - The solar radiation is also cumulative. Subtract by previous hour to get hourly solar radiation
+        -
+
+
+    - See : https://geo.weather.gc.ca/geomet?lang=en&service=WMS&version=1.3.0&request=GetCapabilities for more info on variable description
 
     - CSV output should have the following structure
     DATE AIRTEMP HR RAIN GLOBALRAD
@@ -52,9 +60,11 @@ warnings.filterwarnings("ignore")
 wms_url = 'https://geo.weather.gc.ca/geomet/?SERVICE=WMS&REQUEST=GetFeatureInfo'
 wms = WebMapService(wms_url, version='1.3.0', timeout=300)
 common_var_names = ['TT', 'HR', 'PR', 'N4']  # These are the common variable names between the different forecast models
-forecast_variables = ["AIRTEMP [C]", "HR [%]", "RAIN [mm]",
-                      "GLOBALRAD [Wm2]"]  # This is the desired variable names for the final dataframe
-
+rain_col = "RAIN [mm]"
+temp_col = "AIRTEMP [C]"
+hr_col = "HR [%]"
+rad_col = "GLOBALRAD [Wm2]"
+forecast_variables = [temp_col, hr_col, rain_col, rad_col]
 
 def request(layer: str, times: list, coor: list) -> list:
     pixel_values = []
@@ -125,13 +135,14 @@ def run_gdps(coor: list, nb_timestep: dict,date_col:str):
     print('Getting GDPS')
     GDPS_varlist = ['GDPS.ETA_TT', 'GDPS.ETA_HR', 'GDPS.ETA_PR', 'GDPS.ETA_N4']
     time_local, time_utc = setup_time(GDPS_varlist[0])
-
-    pixel_value_dict_GDPS = {layer: request(layer, time_utc[nb_timestep['RDPS']:nb_timestep['GDPS']], coor) for layer in
+    # time slicing happens a bit different in gdps because dt is by 3 hours and not 1 hour
+    start_idx = [idx for idx,dt in enumerate(time_utc) if dt == (time_utc[0] + timedelta(hours=nb_timestep['RDPS']))][0]
+    pixel_value_dict_GDPS = {layer: request(layer, time_utc[start_idx:], coor) for layer in
                              GDPS_varlist}
     gdps_df = pd.DataFrame.from_dict(pixel_value_dict_GDPS, orient='index').transpose()
-    gdps_df[date_col] = time_local[nb_timestep['RDPS']:nb_timestep['GDPS']]
-    gdps_df['GDPS.ETA_PR'] = gdps_df['GDPS.ETA_PR'].diff()
-    gdps_df['GDPS.ETA_N4'] = (gdps_df['GDPS.ETA_N4'].diff() / 3600).clip(lower=0)
+    gdps_df[date_col] = time_local[start_idx:]
+    gdps_df['GDPS.ETA_PR'] = gdps_df['GDPS.ETA_PR'].diff().clip(lower=0)
+    gdps_df['GDPS.ETA_N4'] = (gdps_df['GDPS.ETA_N4'] / (3*3600)).diff().clip(lower=0)
 
     return gdps_df
 
@@ -145,8 +156,8 @@ def run_hrdps(coor: list, nb_timestep: dict,date_col:str) -> pd.DataFrame:
     pixel_value_dict_HRDPS = {layer: request(layer, time_utc[:nb_timestep['HRDPS']], coor) for layer in HRDPS_varlist}
     hrdps_df = pd.DataFrame.from_dict(pixel_value_dict_HRDPS, orient='index').transpose()
     hrdps_df[date_col] = time_local[:nb_timestep['HRDPS']]
-    hrdps_df['HRDPS.CONTINENTAL_PR'] = hrdps_df['HRDPS.CONTINENTAL_PR'].diff()
-    hrdps_df['HRDPS.CONTINENTAL_N4'] = (hrdps_df['HRDPS.CONTINENTAL_N4'].diff() / 3600).clip(lower=0)
+    hrdps_df['HRDPS.CONTINENTAL_PR'] = hrdps_df['HRDPS.CONTINENTAL_PR'].diff().clip(lower=0)
+    hrdps_df['HRDPS.CONTINENTAL_N4'] = (hrdps_df['HRDPS.CONTINENTAL_N4'] / 3600).diff().clip(lower=0)
 
     return hrdps_df
 
@@ -160,15 +171,15 @@ def run_rdps(coor: list, nb_timestep: dict,date_col:str):
                              in RDPS_varlist}
     rdps_df = pd.DataFrame.from_dict(pixel_value_dict_rdps, orient='index').transpose()
     rdps_df[date_col] = time_local[nb_timestep['HRDPS']:nb_timestep['RDPS']]
-    rdps_df['RDPS.ETA_PR'] = rdps_df['RDPS.ETA_PR'].diff()
-    rdps_df['RDPS.ETA_N4'] = (rdps_df['RDPS.ETA_N4'].diff() / 3600).clip(lower=0)  # remove possible negative values
+    rdps_df['RDPS.ETA_PR'] = rdps_df['RDPS.ETA_PR'].diff().clip(lower=0)
+    rdps_df['RDPS.ETA_N4'] = (rdps_df['RDPS.ETA_N4'] / 3600).diff().clip(lower=0)  # remove possible negative values
     return rdps_df
 
 
 # Main processing function to get RDPS, GDPS, and HRDPS data for each station
 def process_request(station_info: pd.DataFrame,date_col:str) -> dict:
     """
-    process_request is being applied on a pandas dataframe. Therefore the output will be a pd.series where each row is the forecast dictionnary
+    process_request is being applied on a pandas dataframe. Therefore, the output will be a pd.series where each row is the forecast dictionnary
 
     Added intelligent timestep pacing for each forecast.
     Meaning RDPS will only count times after HRDPS and GDPS will only count times after RDPS. HRDPS starts counting from the beggining.
@@ -265,12 +276,13 @@ def load_past_forecast(past_path: str, filename: str, date_col:str) -> pd.DataFr
         print('No file found, returning empty dataframe with columns DATE and TIME')
         return pd.DataFrame(columns=[date_col] + forecast_variables)
     else:
-        df = pd.read_csv(filename, sep=None)
+        df = pd.read_csv(filename, sep=None,dtype={date_col:'datetime64[ns]'})
         if len(df.columns) > 1:
             print("Detected separator: comma")
         else:
-            df = pd.read_csv(f"{past_path}\\{filename}.csv", sep=';')
+            df = pd.read_csv(f"{past_path}\\{filename}.csv", sep=';',dtype={date_col:'datetime64[ns]'})
             print("Detected separator: semicolon")
+
     return df
 
 
@@ -303,31 +315,26 @@ def combine_past_and_current_forecast(past_df: pd.DataFrame, current_df: pd.Data
     # todo : missing answer for condition 5
 
     # Condition 6
-    # Sort dataframes by date in descending order
-    past_df = past_df.sort_values(by=date_col, ascending=False)
-    current_df = current_df.sort_values(by=date_col, ascending=False)
+    # Sort dataframes by date in chronological order
+    past_df = past_df.sort_values(by=date_col, ascending=True)
+    current_df = current_df.sort_values(by=date_col, ascending=True)
 
     # initial forecast hour of current_df has nan for rain (because of .diff() done previously)
     # will try to fill it with the last forecast hour of past_df
-    # the following conditions must therefore be met :
-    # Condition 6a. past_df does not have the corresponding time of current_df. If so, simply give value 0 to rain
-    # Condition 6b. past_df has corresponding time of current_df, but value is nan. If so, simply give value 0 to rain
-    # Condition 6c. past_df has corresponding time of current and a value. If so, give that value to current_df
-    # Condition 6a. Check matching hours
-    if not past_df[date_col].isin([current_df[date_col].iloc[0]]).any():
-        current_df.loc[(current_df[date_col] == current_df[date_col].iloc[0]), 'RAIN'] = 0
-    # Condition 6b. Check nan value
-    if past_df.loc[(past_df[date_col] == current_df[date_col].iloc[0]), 'RAIN'].isna().any():
-        current_df.loc[(current_df[date_col] == current_df[date_col].iloc[0]), 'RAIN'] = 0
-    # Condition 6c. Replace value
-    else :
-        current_df.loc[(current_df[date_col] == current_df[date_col].iloc[0]), 'RAIN'] = past_df.loc[(past_df[date_col] == current_df[date_col].iloc[0]), 'RAIN'].iloc[0]
+    first_date = current_df[date_col].iloc[0]
+    past_matches = past_df[past_df[date_col] == first_date]
+    # Check if there's a matching date in past_df and the RAIN value is not NaN
+    if not past_matches.empty and not pd.isna(past_matches[rain_col].iloc[0]):
+        past_rain = past_matches[rain_col].iloc[0]
+    else:
+        past_rain = 0  # Default to 0 if no matching date or value is NaN
+    # update current_df with the corresponding past_rain value
+    current_df.loc[current_df[date_col] == first_date, rain_col] = past_rain
 
-    # Combine dataframes, prioritizing current forecast
-    combined_df = current_df.combine_first(past_df)
-
-    # Sort by date in ascending order
-    combined_df = combined_df.sort_values(by=date_col)
+    combined_df = (current_df.combine_first(past_df) # Combine dataframes, prioritizing current forecast
+                    .sort_values(by=date_col)   # Sort by date in ascending order
+                   .drop_duplicates(subset=date_col, keep='first')  # Remove duplicate rows
+                   )
 
     return combined_df
 
@@ -386,10 +393,10 @@ def main(config_path):
     for i, row in Stations_info.iterrows():
         try:
             forecast = process_request(row,date_col)
-            forecast_dataframe = concatenate_forecasts(forecast)
+            forecast_dataframe = concatenate_forecasts(forecast,date_col)
             past_forecast = load_past_forecast(path_to_save, f'{row["ID"]}_saved_forecast', date_col)
-            forecast_dataframe = combine_past_and_current_forecast(past_forecast, forecast_dataframe, date_col)
-            forecast_dataframe = fill_missing_hours(forecast_dataframe, date_col)
+            final_forecast = combine_past_and_current_forecast(past_forecast, forecast_dataframe, date_col)
+            final_forecast = fill_missing_hours(final_forecast, date_col)
             save_forecast(forecast_dataframe, path_to_save, f'{row["ID"]}_saved_forecast')
         except Exception as e:
             logger.error(f"Error processing station {row['ID']}: {e}")

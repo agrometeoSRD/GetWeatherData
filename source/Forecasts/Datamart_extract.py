@@ -4,6 +4,12 @@ import xarray as xr
 import urllib.request
 import pandas as pd
 
+#%% Trying out wth sarracenia
+import sarracenia
+
+
+
+#%% Code that doesn't work
 def parse():
     # Pull out the different attributes in the request object
     url = request.json['url']
@@ -37,3 +43,23 @@ def parse():
         'attribute': attribute,
         'results': results
     }
+
+
+import requests
+
+def download_data(api_url, headers=None, params=None):
+    response = requests.get(api_url, headers=headers, params=params)
+
+    if response.status_code == 200:
+        return response.json()  # or response.text if the data is not in json format
+    else:
+        print(f"Failed to download data. Status code: {response.status_code}")
+        return None
+
+# Replace with your actual API URL, headers, and parameters
+api_url = "https://example.com/api"
+headers = {"Authorization": "Bearer YOUR_ACCESS_TOKEN"}
+params = {"param1": "value1", "param2": "value2"}
+
+data = download_data(api_url, headers, params)
+

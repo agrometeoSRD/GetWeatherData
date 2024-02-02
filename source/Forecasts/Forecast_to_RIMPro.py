@@ -62,9 +62,9 @@ def write_df_to_RIMpro_csv(df : pd.DataFrame, path_output : str, staname : str, 
         df.to_csv(OF, index=False, sep=';',lineterminator='\n')
 
 # %% Read station information and
-path_to_station_file = r"C:\Scripts\PycharmProjects\GetWeatherData\source\Forecasts"
-path_to_forecasts = r"C:\Scripts\PycharmProjects\GetWeatherData\source\Forecasts\saved_forecasts"
-path_to_rimpro = r"C:\Scripts\PycharmProjects\GetWeatherData\source\Forecasts\rimpro_forecasts"
+path_to_station_file = f"C:\\Users\\{os.getenv('USERNAME')}\\PycharmProjects\\GetWeatherData\\source\\Forecasts"
+path_to_forecasts = f"C:\\Users\\{os.getenv('USERNAME')}\\PycharmProjects\\GetWeatherData\\source\\Forecasts\\saved_forecasts"
+path_to_rimpro = f"C:\\Users\\{os.getenv('USERNAME')}\\PycharmProjects\\GetWeatherData\\source\\Forecasts\\rimpro_forecasts"
 InFile = os.path.join(path_to_station_file, 'VStations_test.dat')
 Stations_info = pd.read_csv(InFile, skiprows=2)
 

@@ -1,63 +1,76 @@
-import re
+
+# imports
 import os
-import pandas as pd
-import numpy as np
-import time
+import re
+import warnings
+from datetime import datetime, timedelta
 from functools import reduce
+import time
+import pytz
+import pandas as pd
 from owslib.util import ServiceException
 from owslib.wms import WebMapService
-from datetime import datetime, timedelta
-import pytz
 
-import asyncio
+warnings.filterwarnings("ignore")
 import aiohttp
+import asyncio
+import logging
+import configparser
 
 wms_url = 'https://geo.weather.gc.ca/geomet/?SERVICE=WMS&REQUEST=GetFeatureInfo'
-wms = WebMapService(wms_url , version='1.3.0', timeout=300)
-common_var_names = ['TT', 'HR', 'PR', 'N4'] # These are the common variable names between the different forecast models
-forecast_variables = ["AIRTEMP", "HR", "RAIN","GLOBALRAD"] # This is the desired variable names for the final dataframe
+wms = WebMapService(wms_url, version='1.3.0', timeout=300)
+common_var_names = ['TT', 'HR', 'PR', 'N4']  # These are the common variable names between the different forecast models
+rain_col = "RAIN [mm]"
+temp_col = "AIRTEMP [C]"
+hr_col = "HR [%]"
+rad_col = "GLOBALRAD [Wm2]"
+forecast_variables = [temp_col, hr_col, rain_col, rad_col]
 
-# Async version of the request function
-async def async_request(session:aiohttp.ClientSession,layer: str, timestep: datetime, coor: list) -> float:
-    # Create an aiohttp client session for making HTTP requests
-    # Iterate through each timestep
-    print(timestep, layer)
-    # Get the request URL using the OWSLib library
-    try :
-        url = wms.getfeatureinfo(layers=[layer],
-                                 srs='EPSG:4326',
-                                 bbox=tuple(coor),
-                                 size=(100, 100),
-                                 format='image/jpeg',
-                                 query_layers=[layer],
-                                 info_format='text/plain',
-                                 xy=(1, 1),
-                                 feature_count=1,
-                                 time=str(timestep.isoformat()) + 'Z'
-                                 ).geturl()
-        print(url)
-        # Make an asynchronous GET request to the URL
-        async with session.get(url) as resp:
-            # Check if the response status is OK (200)
-            if resp.status == 200:
-                # Read the text content of the response
-                text = await resp.text()
-                # Extract the value using a regex pattern
-                value_str = re.search(r'value_0\s+\d*.*\d+', text)
-                if value_str:
-                    return float(re.sub('value_0 = \'', '', value_str.group()).strip('[""]'))
-            else:
-                # If the response status is not OK, print an error message
-                print(f'Request could not be made for some reason at time = {timestep} and layer = {layer}')
-                return float('nan')
+import concurrent.futures
+import functools  # at the top with the other imports
+async def request(session:aiohttp.ClientSession,layer: str, times:list, coor: list) -> list:
+    pixel_values = []
+    for timestep in times:
+        print(timestep, layer)
+        try :
+            loop = asyncio.get_event_loop()
+            response_object = await loop.run_in_executor(
+                None,
+                functools.partial(
+                    wms.getfeatureinfo,
+                    layers=[layer],
+                    srs='EPSG:4326',
+                    bbox=tuple(coor),
+                    size=(100, 100),
+                    format='image/jpeg',
+                    query_layers=[layer],
+                    info_format='text/plain',
+                    xy=(1, 1),
+                    feature_count=1,
+                    time=timestep.isoformat() + 'Z'
+                )
+            )
+            url = wms.request
+            print(url)
+            async with session.get(url) as resp:
+                if resp.status == 200:
+                    text = await resp.text()
+                    value_str = re.search(r'value_0\s+\d*.*\d+', text)
+                    if value_str:
+                        pixel_values.append(re.sub('value_0 = \'', '', value_str.group()).strip('[""]'))
+                else:
+                    print(f'Request could not be made for some reason at time = {timestep} and layer = {layer}')
+                    pixel_values.append(float('nan'))
 
-    except ServiceException:
-        # Handle any ServiceException errors
-        print(f'Request could not be made for some reason at time = {timestep} and layer = {layer}')
-        return float('nan')
+        except ServiceException:
+            print(f'Request could not be made for some reason at time = {timestep} and layer = {layer}')
+            pixel_values.append(float('nan'))
 
-# Extraction of temporal information from metadata (this is exactly how ECCC does it in their tutorial)
-def time_parameters(layer : str):
+    return pixel_values
+
+
+# Extraction of temporal information from metadata
+def time_parameters(layer):
     start_time, end_time, interval = (wms[layer]
                                       .dimensions['time']['values'][0]
                                       .split('/')
@@ -68,7 +81,7 @@ def time_parameters(layer : str):
     interval = int(re.sub(r'\D', '', interval))
     return start_time, end_time, interval
 
-def setup_time(layer : str):
+def setup_time(layer):
     '''
     This is what's proposed by ECCC in their tutorial
     :param layer:
@@ -88,91 +101,112 @@ def setup_time(layer : str):
     # Convert time to local time zone
     time_local = [t.replace(tzinfo=pytz.utc).astimezone(au_tz).replace(tzinfo=None) for t in time_utc]
 
-    return time_local,time_utc
+    return time_local, time_utc
 
-# Async version of the run_* functions
-async def async_run_model(session,model_name:str, varlist:list, coor:list, nb_timestep:int) -> pd.DataFrame:
-    print(f'Getting {model_name}')
-    time_local, time_utc = setup_time(varlist[0])
-    results = []
-    for layer in varlist:
-        layer_results = await asyncio.gather(
-            *[async_request(session, layer, timestep, coor) for timestep in time_utc[:nb_timestep]]
-        )
-        results.append(layer_results)
-    model_df = pd.DataFrame(results, index=varlist).transpose()
-    model_df['Date'] = time_local[:nb_timestep]
-    model_df[f'{model_name}_PR'] = model_df[f'{model_name}_PR'].diff()
-    model_df[f'{model_name}_N4'] = (model_df[f'{model_name}_N4'].diff() / 3600).clip(lower=0) # remove possible negative values
-    return model_df
 
-# Modification of the process_request function to use asyncio
-async def async_process_request(station_info: pd.DataFrame, nb_timestep=24) -> dict:
+async def run_hrdps(session, coor: list, nb_timestep: dict,date_col:str) -> pd.DataFrame:
+    print('Getting HRDPS')
+    HRDPS_varlist = ['HRDPS.CONTINENTAL_TT', 'HRDPS.CONTINENTAL_HR', 'HRDPS.CONTINENTAL_PR', 'HRDPS.CONTINENTAL_N4']
+    time_local, time_utc = setup_time(HRDPS_varlist[0])
+
+    pixel_value_dict_HRPDS = await asyncio.gather(*[request(session, layer, time_utc[:nb_timestep['HRDPS']], coor) for layer in HRDPS_varlist])
+    hrdps_df = pd.DataFrame.from_dict(dict(zip(HRDPS_varlist,pixel_value_dict_HRPDS)), orient='index').transpose()
+    hrdps_df[date_col] = time_local[:nb_timestep['HRDPS']]
+    hrdps_df['HRDPS.CONTINENTAL_PR'] = hrdps_df['HRDPS.CONTINENTAL_PR'].diff().clip(lower=0)
+    hrdps_df['HRDPS.CONTINENTAL_N4'] = (hrdps_df['HRDPS.CONTINENTAL_N4'] / 3600).diff().clip(lower=0)
+
+    return hrdps_df
+
+async def run_rdps(session, coor: list, nb_timestep: dict,date_col:str):
+    print('Getting RDPS')
+    RDPS_varlist = ['RDPS.ETA_TT', 'RDPS.ETA_HR', 'RDPS.ETA_PR', 'RDPS.ETA_N4']
+    time_local, time_utc = setup_time(RDPS_varlist[0])
+
+    pixel_value_dict_rdps = await asyncio.gather(*[request(session, layer, time_utc[nb_timestep['HRDPS']:nb_timestep['RDPS']], coor) for layer in RDPS_varlist])
+    rdps_df = pd.DataFrame.from_dict(dict(zip(RDPS_varlist,pixel_value_dict_rdps)), orient='index').transpose()
+    rdps_df[date_col] = time_local[nb_timestep['HRDPS']:nb_timestep['RDPS']]
+    rdps_df['RDPS.ETA_PR'] = rdps_df['RDPS.ETA_PR'].diff().clip(lower=0)
+    rdps_df['RDPS.ETA_N4'] = (rdps_df['RDPS.ETA_N4'] / 3600).diff().clip(lower=0)  # remove possible negative values
+    return rdps_df
+
+async def run_gdps(session, coor: list, nb_timestep: dict,date_col:str):
+    print('Getting GDPS')
+    GDPS_varlist = ['GDPS.ETA_TT', 'GDPS.ETA_HR', 'GDPS.ETA_PR', 'GDPS.ETA_N4']
+    time_local, time_utc = setup_time(GDPS_varlist[0])
+    start_idx = [idx for idx,dt in enumerate(time_utc) if dt == (time_utc[0] + timedelta(hours=nb_timestep['RDPS']))][0]
+    # pixel_value_dict_GDPS = await asyncio.gather(*[request(session, layer, time_utc[start_idx:], coor) for layer in GDPS_varlist], return_exceptions=True)
+    pixel_value_dict_GDPS = []
+    for layer in GDPS_varlist:
+        result = await request(session, layer, time_utc[start_idx:], coor)
+        pixel_value_dict_GDPS.append(result)
+
+    gdps_df = pd.DataFrame.from_dict(dict(zip(GDPS_varlist, pixel_value_dict_GDPS)), orient='index').transpose()
+    gdps_df[date_col] = time_local[start_idx:]
+    gdps_df['GDPS.ETA_PR'] = gdps_df['GDPS.ETA_PR'].diff().clip(lower=0)
+    gdps_df['GDPS.ETA_N4'] = (gdps_df['GDPS.ETA_N4'] / (3*3600)).diff().clip(lower=0)
+
+    return gdps_df
+
+# Similar changes for run_hrdps and run_rdps...
+
+async def process_request(session, station_info: pd.Series,date_col:str) -> dict:
+    print(f'Acquiring forecast for station : {station_info["Name"]}')
     coor = [station_info['Lon'], station_info['Lat2'], station_info['Lon2'], station_info['Lat']]
+    # timesteps_dict = {'HRDPS': 48, 'RDPS': 84, 'GDPS': 120}
+    timesteps_dict = {'HRDPS': 48, 'RDPS': 3, 'GDPS': 10}
 
-    # Start all three model data fetches in parallel
-    async with aiohttp.ClientSession() as session:
-        RDPS_df = await async_run_model(session, 'RDPS', ['RDPS.ETA_TT', 'RDPS.ETA_HR', 'RDPS.ETA_PR', 'RDPS.ETA_N4'], coor, nb_timestep)
-        GDPS_df = await async_run_model(session, 'GDPS', ['GDPS.ETA_TT', 'GDPS.ETA_HR', 'GDPS.ETA_PR', 'GDPS.ETA_N4'], coor, nb_timestep)
-        HRDPS_df = await async_run_model(session, 'HRDPS', ['HRDPS.CONTINENTAL_TT', 'HRDPS.CONTINENTAL_HR', 'HRDPS.CONTINENTAL_PR', 'HRDPS.CONTINENTAL_N4'], coor, nb_timestep)
+    # hrdps_df = pd.DataFrame()
+    # rdps_df = pd.DataFrame()
+    gdps_df = await asyncio.gather(run_gdps(session,coor,timesteps_dict,date_col))
+    # hrdps_df, rdps_df, gdps_df = await asyncio.gather(
+    #     run_hrdps(session, coor,timesteps_dict, date_col),
+    #     run_rdps(session, coor,timesteps_dict, date_col),
+    #     run_gdps(session, coor,timesteps_dict, date_col)
+    # )
 
-    return {'RDPS': RDPS_df, 'GDPS': GDPS_df, 'HRDPS': HRDPS_df}
-    # return {'RDPS':RDPS_df}
+    # return {'RDPS': rdps_df, 'GDPS': gdps_df, 'HRDPS': hrdps_df}
+    return gdps_df
 
-def fill_missing_hours(df : pd.DataFrame, date_col : str) -> pd.DataFrame:
-    min_date = df[date_col].min()
-    max_date = df[date_col].max()
+async def main(config_path):
+    start_time = time.time()
 
-    # Create a DatetimeIndex for every hour between min_date and max_date
-    full_index = pd.date_range(min_date, max_date, freq='H')
+    # Set up logging
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    logger = logging.getLogger(__name__)
 
-    # Set the date column as the index of the dataframe
-    df = (df.set_index(date_col)
-          .reindex(full_index) # Reindex the dataframe using the full index, which fills in missing hours with NaNs
-          .reset_index()  # Reset the index so the date column is a regular column again
-          .rename(columns={'index':date_col})
-          )
-    return df
+    # Load configuration
+    config = configparser.ConfigParser()
+    config.read(config_path)
 
-def concatenate_forecasts(forecast_dict : dict) -> pd.DataFrame:
-    '''
-    Combine forecast data into a single uniform time series
-    :return: A single dataframe with all forecast data combined into a single time series
-    '''
+    path_to_script = config.get('Paths', 'ScriptPath')
+    path_to_save = config.get('Paths', 'SavePath')
+    date_col = config.get('General', 'DateColumn')
 
-    # merge all three dataframes. Also check for any missing hours between min and max dates and if so, fill with nans
-    df_merged = (reduce(lambda left, right: pd.merge(left, right, on=['Date'], how='outer'), [forecast_dict['HRDPS'],forecast_dict['RDPS'],forecast_dict['GDPS']])
-             .pipe(fill_missing_hours,'Date'))
+    # Load station info
+    InFile = os.path.join(path_to_script, 'VStations_test.dat')
+    try:
+        Stations_info = pd.read_csv(InFile, skiprows=2)
+    except Exception as e:
+        logger.error(f"Error reading file {InFile}: {e}")
+        return
 
-    # Currently df_merged is a single dataframe, but it has different columns for every forecast.
-    # Create a list where each index is a specific variable (like PR) but it has all the different dataframes together
-    groups = [df_merged.columns[df_merged.columns.str[-2:].isin([suffix])] for suffix in common_var_names]
-
-    # Add new columns to df_merged, columns that are called from the list Forecast_Variables_List
-    for i in range(len(common_var_names)):
-        df_merged[forecast_variables[i]] = reduce(lambda left, right: left.combine_first(right),
-                                                       [df_merged[gr] for gr in groups[i]])
-
-    return df_merged[['Date'] + forecast_variables]
-
-# Modification to the main execution to use asyncio
-async def main():
-    # Example usage with a single station info row
-    # Read station information and process each station
-    Path_To_Script = r"C:\Users\sebastien.durocher\PycharmProjects\GetWeatherData\source\Forecasts"
-    InFile = os.path.join(Path_To_Script, 'VStations_test.dat')
-    Stations_info = pd.read_csv(InFile, skiprows=2)
+    # Additional processing
     Stations_info['Lon2'] = Stations_info['Lon'] + 0.1
     Stations_info['Lat2'] = Stations_info['Lat'] - 0.1
-    single_station_info = Stations_info.iloc[0]
 
-    forecasts = await async_process_request(single_station_info)
-    forecast_dataframe = concatenate_forecasts(forecasts)
-    forecast_dataframe = forecast_dataframe.interpolate()
-    print(forecast_dataframe)
+    connector = aiohttp.TCPConnector(force_close=True)
+    async with aiohttp.ClientSession(connector=connector) as session:
+        tasks = [process_request(session, row, date_col) for _, row in Stations_info.iterrows()]
+        results = await asyncio.gather(*tasks)
 
-# Run the main function using asyncio
-start_time = time.time()
-asyncio.run(main())
-elapsed_time = time.time() - start_time
-print(f"Script execution time: {elapsed_time} seconds")
+    # Process results...
+    print('Here is the forecast results')
+    print(results)
+
+    elapsed_time = time.time() - start_time
+    logger.info(f"Script completed in {elapsed_time} seconds")
+
+if __name__ == "__main__":
+    # Define path to configuration file
+    config_file_path = f'C:\\Users\\{os.getenv("USERNAME")}\\PycharmProjects\\GetWeatherData\\source\\Forecasts\\config.ini'
+    asyncio.run(main(config_file_path))

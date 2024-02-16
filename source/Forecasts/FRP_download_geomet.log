@@ -1,0 +1,608 @@
+Forecast MWS Download log
+Reports every download process to track errors.
+
+/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
+File download started on 2023/05/10 at 18:17:13(local time)
+
+/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
+File download started on 2023/05/10 at 18:18:45(local time)
+
+/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
+File download started on 2023/05/10 at 18:18:52(local time)
+
+/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
+File download started on 2023/05/10 at 18:22:08(local time)
+
+/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
+File download started on 2023/05/10 at 18:42:08(local time)
+
+/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
+File download started on 2023/05/10 at 18:42:51(local time)
+Station LAPECHE : date: 2023/05/10 at 18:42:54, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+
+/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
+File download started on 2023/05/10 at 18:45:41(local time)
+Station LAPECHE : date: 2023/05/10 at 18:45:46, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+
+/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
+File download started on 2023/05/10 at 18:50:01(local time)
+Station LAPECHE : date: 2023/05/10 at 18:50:04, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:50:15, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:50:16, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:50:18, Error message: Warning for variable HRDPS.CONTINENTAL_NT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:50:18, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:50:19, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:50:19, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:50:20, Error message: Warning for variable HRDPS.CONTINENTAL_NT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:50:20, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:50:21, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:50:21, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:50:21, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:50:22, Error message: Warning for variable HRDPS.CONTINENTAL_NT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:50:22, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:50:23, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:50:23, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:50:24, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:50:24, Error message: Warning for variable HRDPS.CONTINENTAL_NT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:50:24, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:50:25, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:50:25, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:50:26, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:50:26, Error message: Warning for variable HRDPS.CONTINENTAL_NT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:50:27, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:50:27, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+
+/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
+File download started on 2023/05/10 at 18:52:11(local time)
+
+/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
+File download started on 2023/05/10 at 18:54:31(local time)
+Station LAPECHE : date: 2023/05/10 at 18:54:33, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:56:02, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:56:03, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:56:03, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:56:04, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:56:04, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:56:05, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:56:05, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:56:05, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:56:06, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:56:06, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:56:07, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:56:07, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:56:08, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:56:08, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:56:08, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:56:09, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:56:09, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:56:10, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:56:10, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:56:11, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:56:11, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:56:12, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:56:12, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 18:56:14, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+
+/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
+File download started on 2023/05/10 at 19:06:42(local time)
+Station LAPECHE : date: 2023/05/10 at 19:06:43, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:08:15, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:08:16, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:08:16, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:08:17, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:08:18, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:08:18, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:08:19, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:08:19, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:08:20, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:08:20, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:08:20, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:08:21, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:08:21, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:08:22, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:08:22, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:08:22, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:08:23, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:08:23, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:08:23, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:08:24, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:08:24, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:08:25, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:08:25, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:08:27, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+
+/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
+File download started on 2023/05/10 at 19:19:58(local time)
+Station LAPECHE : date: 2023/05/10 at 19:19:59, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:21:31, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:21:31, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:21:32, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:21:32, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:21:33, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:21:33, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:21:34, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:21:34, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:21:35, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:21:35, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:21:35, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:21:36, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:21:36, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:21:37, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:21:37, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:21:38, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:21:38, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:21:38, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:21:39, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:21:40, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:21:41, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:21:41, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:21:41, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:21:44, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+
+/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
+File download started on 2023/05/10 at 19:28:16(local time)
+Station LAPECHE : date: 2023/05/10 at 19:28:18, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:29:41, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:29:42, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:29:42, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:29:43, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:29:43, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:29:44, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:29:44, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:29:45, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:29:45, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:29:46, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:29:46, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:29:46, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:29:47, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:29:47, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:29:48, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:29:48, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:29:48, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:29:49, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:29:49, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:29:50, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:29:50, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:29:51, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:29:51, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/10 at 19:29:54, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+
+/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
+File download started on 2023/05/10 at 19:54:26(local time)
+Station LAPECHE : date: 2023/05/10 at 19:54:40, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+
+/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
+File download started on 2023/05/10 at 23:42:14(local time)
+Station STJOS : date: 2023/05/11 at 00:20:36, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 00:20:36, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 00:20:37, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 00:20:38, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 00:20:38, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 00:20:38, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 00:20:39, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 00:20:39, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 00:20:39, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 00:20:40, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 00:20:40, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 00:20:41, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 00:20:41, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 00:20:42, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 00:20:42, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 00:20:42, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 00:20:43, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 00:20:43, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 00:20:44, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 00:20:44, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 00:20:45, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 00:20:45, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 00:20:45, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 00:20:47, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 00:23:39, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 00:23:39, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 00:23:40, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 00:23:40, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 00:23:41, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 00:23:41, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 00:23:42, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 00:23:42, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 00:23:42, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 00:23:43, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 00:23:43, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 00:23:44, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 00:23:44, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 00:23:44, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 00:23:45, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 00:23:45, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 00:23:46, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 00:23:46, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 00:23:46, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 00:23:47, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 00:23:47, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 00:23:48, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 00:23:48, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 00:23:50, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 00:26:38, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 00:26:38, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 00:26:39, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 00:26:40, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 00:26:40, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 00:26:40, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 00:26:41, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 00:26:41, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 00:26:42, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 00:26:42, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 00:26:43, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 00:26:43, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 00:26:44, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 00:26:44, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 00:26:44, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 00:26:45, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 00:26:45, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 00:26:46, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 00:26:46, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 00:26:46, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 00:26:47, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 00:26:47, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 00:26:47, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 00:26:49, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 00:29:39, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 00:29:39, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 00:29:40, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 00:29:41, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 00:29:41, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 00:29:41, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 00:29:42, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 00:29:42, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 00:29:43, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 00:29:43, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 00:29:44, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 00:29:44, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 00:29:44, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 00:29:45, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 00:29:45, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 00:29:45, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 00:29:46, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 00:29:46, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 00:29:47, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 00:29:47, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 00:29:47, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 00:29:48, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 00:29:48, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 00:29:50, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 00:32:41, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 00:32:42, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 00:32:42, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 00:32:43, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 00:32:43, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 00:32:44, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 00:32:44, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 00:32:44, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 00:32:45, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 00:32:45, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 00:32:46, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 00:32:46, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 00:32:46, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 00:32:47, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 00:32:47, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 00:32:48, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 00:32:48, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 00:32:48, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 00:32:49, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 00:32:49, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 00:32:50, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 00:32:50, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 00:32:50, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 00:32:52, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 00:35:38, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 00:35:39, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 00:35:39, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 00:35:40, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 00:35:40, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 00:35:41, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 00:35:41, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 00:35:41, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 00:35:42, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 00:35:42, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 00:35:43, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 00:35:43, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 00:35:44, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 00:35:44, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 00:35:45, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 00:35:45, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 00:35:45, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 00:35:46, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 00:35:46, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 00:35:47, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 00:35:47, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 00:35:47, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 00:35:48, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 00:35:50, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 00:38:34, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 00:38:35, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 00:38:35, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 00:38:36, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 00:38:37, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 00:38:37, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 00:38:37, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 00:38:38, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 00:38:38, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 00:38:38, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 00:38:39, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 00:38:39, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 00:38:40, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 00:38:40, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 00:38:40, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 00:38:41, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 00:38:41, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 00:38:42, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 00:38:42, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 00:38:42, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 00:38:43, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 00:38:43, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 00:38:43, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 00:38:46, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+
+/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
+File download started on 2023/05/11 at 12:42:16(local time)
+Station STJOS : date: 2023/05/11 at 13:21:02, Error message: Warning for variable GDPS.ETA_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:21:02, Error message: Warning for variable GDPS.ETA_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:21:02, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:21:04, Error message: Warning for variable GDPS.ETA_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:21:05, Error message: Warning for variable GDPS.ETA_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:21:06, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:21:07, Error message: Warning for variable GDPS.ETA_PR : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:21:08, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:21:09, Error message: Warning for variable GDPS.ETA_PR : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:22:29, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:22:29, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:22:29, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:22:30, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:22:30, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:22:31, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:22:31, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:22:32, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:22:32, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:22:33, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:22:33, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:22:33, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:22:34, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:22:34, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:22:35, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:22:35, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:22:35, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:22:36, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:22:36, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:22:37, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:22:37, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:22:37, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:22:38, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station STJOS : date: 2023/05/11 at 13:22:40, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:24:05, Error message: Warning for variable GDPS.ETA_TT : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:24:06, Error message: Warning for variable GDPS.ETA_HR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:24:06, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:24:07, Error message: Warning for variable GDPS.ETA_TT : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:24:07, Error message: Warning for variable GDPS.ETA_HR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:24:09, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:24:09, Error message: Warning for variable GDPS.ETA_PR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:24:12, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:24:12, Error message: Warning for variable GDPS.ETA_PR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:25:35, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:25:35, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:25:36, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:25:37, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:25:37, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:25:37, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:25:38, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:25:38, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:25:39, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:25:39, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:25:39, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:25:40, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:25:40, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:25:40, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:25:41, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:25:41, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:25:42, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:25:42, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:25:42, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:25:43, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:25:43, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:25:44, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:25:44, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station VTCVILLE : date: 2023/05/11 at 13:25:46, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:27:11, Error message: Warning for variable GDPS.ETA_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:27:11, Error message: Warning for variable GDPS.ETA_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:27:13, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:27:13, Error message: Warning for variable GDPS.ETA_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:27:14, Error message: Warning for variable GDPS.ETA_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:27:15, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:27:15, Error message: Warning for variable GDPS.ETA_PR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:27:17, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:27:17, Error message: Warning for variable GDPS.ETA_PR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:28:38, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:28:38, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:28:38, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:28:39, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:28:40, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:28:40, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:28:40, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:28:41, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:28:41, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:28:42, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:28:42, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:28:42, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:28:43, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:28:43, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:28:43, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:28:44, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:28:44, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:28:45, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:28:45, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:28:45, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:28:46, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:28:46, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:28:47, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station STSYLV : date: 2023/05/11 at 13:28:49, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:30:16, Error message: Warning for variable GDPS.ETA_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:30:17, Error message: Warning for variable GDPS.ETA_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:30:17, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:30:18, Error message: Warning for variable GDPS.ETA_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:30:18, Error message: Warning for variable GDPS.ETA_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:30:19, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:30:19, Error message: Warning for variable GDPS.ETA_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:30:21, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:30:21, Error message: Warning for variable GDPS.ETA_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:31:43, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:31:44, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:31:44, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:31:45, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:31:45, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:31:46, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:31:46, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:31:46, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:31:47, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:31:47, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:31:48, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:31:48, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:31:48, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:31:49, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:31:49, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:31:50, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:31:50, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:31:50, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:31:51, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:31:51, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:31:52, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:31:52, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:31:52, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ORLEAN : date: 2023/05/11 at 13:31:54, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:33:21, Error message: Warning for variable GDPS.ETA_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:33:22, Error message: Warning for variable GDPS.ETA_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:33:22, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:33:23, Error message: Warning for variable GDPS.ETA_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:33:23, Error message: Warning for variable GDPS.ETA_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:33:24, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:33:24, Error message: Warning for variable GDPS.ETA_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:33:26, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:33:26, Error message: Warning for variable GDPS.ETA_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:34:47, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:34:48, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:34:48, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:34:49, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:34:49, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:34:50, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:34:50, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:34:50, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:34:51, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:34:51, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:34:52, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:34:52, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:34:52, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:34:53, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:34:53, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:34:54, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:34:54, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:34:54, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:34:55, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:34:55, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:34:56, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:34:56, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:34:56, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station ILISLET : date: 2023/05/11 at 13:34:58, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:36:26, Error message: Warning for variable GDPS.ETA_TT : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:36:26, Error message: Warning for variable GDPS.ETA_HR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:36:27, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:36:28, Error message: Warning for variable GDPS.ETA_TT : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:36:28, Error message: Warning for variable GDPS.ETA_HR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:36:28, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:36:29, Error message: Warning for variable GDPS.ETA_PR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:36:30, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:36:31, Error message: Warning for variable GDPS.ETA_PR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:37:53, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:37:54, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:37:54, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:37:55, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:37:55, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:37:55, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:37:56, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:37:56, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:37:56, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:37:57, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:37:57, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:37:57, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:37:58, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:37:58, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:37:59, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:37:59, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:37:59, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:38:00, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:38:00, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:38:00, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:38:01, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:38:01, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:38:02, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station DSCHAMBLT : date: 2023/05/11 at 13:38:03, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:39:35, Error message: Warning for variable GDPS.ETA_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:39:36, Error message: Warning for variable GDPS.ETA_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:39:36, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:39:37, Error message: Warning for variable GDPS.ETA_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:39:37, Error message: Warning for variable GDPS.ETA_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:39:38, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:39:38, Error message: Warning for variable GDPS.ETA_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:39:39, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:39:40, Error message: Warning for variable GDPS.ETA_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:41:06, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:41:07, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:41:07, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:41:08, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:41:09, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:41:09, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:41:09, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:41:10, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:41:10, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:41:10, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:41:11, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:41:11, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:41:12, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:41:12, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:41:13, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:41:13, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:41:13, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:41:14, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:41:14, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:41:15, Error message: Warning for variable HRDPS.CONTINENTAL_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:41:15, Error message: Warning for variable HRDPS.CONTINENTAL_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:41:15, Error message: Warning for variable HRDPS.CONTINENTAL_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:41:16, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LEVIS : date: 2023/05/11 at 13:41:18, Error message: Warning for variable HRDPS.CONTINENTAL_PR : temps en dehors des heures valides / time outside valid hours| 
+
+/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
+File download started on 2023/05/11 at 14:02:53(local time)
+Station LAPECHE : date: 2023/05/11 at 14:09:13, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+
+/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
+File download started on 2023/05/11 at 14:14:31(local time)
+
+/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
+File download started on 2023/05/11 at 14:16:30(local time)
+
+/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
+File download started on 2023/05/11 at 14:17:33(local time)
+
+/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
+File download started on 2023/05/11 at 15:47:04(local time)
+Station LAPECHE : date: 2023/05/11 at 15:47:06, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+
+/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
+File download started on 2023/05/11 at 15:53:38(local time)
+
+/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
+File download started on 2023/05/11 at 20:32:23(local time)
+Station LAPECHE : date: 2023/05/11 at 21:00:43, Error message: Warning for variable GDPS.ETA_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/11 at 21:00:43, Error message: Warning for variable GDPS.ETA_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/11 at 21:00:44, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/11 at 21:00:44, Error message: Warning for variable GDPS.ETA_PR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/11 at 21:00:45, Error message: Warning for variable GDPS.ETA_TT : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/11 at 21:00:45, Error message: Warning for variable GDPS.ETA_HR : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/11 at 21:00:46, Error message: Warning for variable GDPS.ETA_N4 : temps en dehors des heures valides / time outside valid hours| 
+Station LAPECHE : date: 2023/05/11 at 21:00:46, Error message: Warning for variable GDPS.ETA_PR : temps en dehors des heures valides / time outside valid hours| 

@@ -21,8 +21,6 @@ Notes:
     - Solar radiation (N4 to GLOBALRAD) :
         - Raw solar radiation is in J/m2. To conver to W/m2, divide by 3600 (for seconds) (divide by 3*3600 for GDPS cause dt = 3 hours)
         - The solar radiation is also cumulative. Subtract by previous hour to get hourly solar radiation
-        -
-
 
     - See : https://geo.weather.gc.ca/geomet?lang=en&service=WMS&version=1.3.0&request=GetCapabilities for more info on variable description
 
@@ -40,6 +38,7 @@ Notes:
 # TODO : Find some way to incorporate a percentage progress bar
 
 # imports
+import sys
 import os
 import re
 import warnings
@@ -47,7 +46,10 @@ from datetime import datetime, timedelta
 from functools import reduce
 import time
 import pytz
+import numpy as np
 import pandas as pd
+import logging
+import configparser
 from owslib.util import ServiceException
 from owslib.wms import WebMapService
 
@@ -60,11 +62,23 @@ warnings.filterwarnings("ignore")
 wms_url = 'https://geo.weather.gc.ca/geomet/?SERVICE=WMS&REQUEST=GetFeatureInfo'
 wms = WebMapService(wms_url, version='1.3.0', timeout=300)
 common_var_names = ['TT', 'HR', 'PR', 'N4']  # These are the common variable names between the different forecast models
-rain_col = "RAIN [mm]"
-temp_col = "AIRTEMP [C]"
-hr_col = "HR [%]"
-rad_col = "GLOBALRAD [Wm2]"
-forecast_variables = [temp_col, hr_col, rain_col, rad_col]
+
+
+def load_config_file():
+    # Get the directory of the current script
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+
+    # Join the script directory with the name of the configuration file
+    config_file_path = os.path.join(script_dir, 'config.ini')
+
+    # Check if the configuration file exists
+    if not os.path.isfile(config_file_path):
+        raise FileNotFoundError(f"Configuration file does not exist: {config_file_path}")
+
+    config = configparser.ConfigParser()
+    config.read(config_file_path)
+
+    return config
 
 def request(layer: str, times: list, coor: list) -> list:
     pixel_values = []
@@ -324,12 +338,12 @@ def combine_past_and_current_forecast(past_df: pd.DataFrame, current_df: pd.Data
     first_date = current_df[date_col].iloc[0]
     past_matches = past_df[past_df[date_col] == first_date]
     # Check if there's a matching date in past_df and the RAIN value is not NaN
-    if not past_matches.empty and not pd.isna(past_matches[rain_col].iloc[0]):
-        past_rain = past_matches[rain_col].iloc[0]
+    if not past_matches.empty and not pd.isna(past_matches[config['rain_col']].iloc[0]):
+        past_rain = past_matches[config['rain_col']].iloc[0]
     else:
         past_rain = 0  # Default to 0 if no matching date or value is NaN
     # update current_df with the corresponding past_rain value
-    current_df.loc[current_df[date_col] == first_date, rain_col] = past_rain
+    current_df.loc[current_df[date_col] == first_date, config['rain_col']] = past_rain
 
     combined_df = (current_df.combine_first(past_df) # Combine dataframes, prioritizing current forecast
                     .sort_values(by=date_col)   # Sort by date in ascending order
@@ -349,18 +363,13 @@ def sanity_check(df: pd.DataFrame):
 def save_forecast(forecast_df: pd.DataFrame, save_path: str, filename: str):
     out = f"{save_path}\\{filename}.csv"
     print(f'Saving forecast to : {out}')
-    forecast_df.to_csv(f"{out}", index=False, sep=';')
+    forecast_df.to_csv(out, index=False, sep=';',na_rep=np.nan)
 
 
 # %% Read station information and process each station
-import logging
-import configparser
-from pathlib import Path
 
 def main(config_path):
     start_time = time.time()
-
-    # Set up logging
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     logger = logging.getLogger(__name__)
 
@@ -369,45 +378,40 @@ def main(config_path):
     config.read(config_path)
 
     path_to_script = config.get('Paths', 'ScriptPath')
-    path_to_save = config.get('Paths', 'SavePath')
+    path_to_save = config.get('Paths', 'SavedForecastsPath')
     date_col = config.get('General', 'DateColumn')
 
     # Load station info
-    InFile = os.path.join(path_to_script, 'VStations_test.dat')
+    InFile = os.path.join(path_to_script, 'VStations_p1_test.dat')
     try:
         Stations_info = pd.read_csv(InFile, skiprows=2)
     except Exception as e:
         logger.error(f"Error reading file {InFile}: {e}")
-        return
+        sys.exit(1)
 
     # Additional processing
     Stations_info['Lon2'] = Stations_info['Lon'] + 0.1
     Stations_info['Lat2'] = Stations_info['Lat'] - 0.1
 
-    InFile = os.path.join(path_to_script, 'VStations_test.dat')
-    Stations_info = pd.read_csv(InFile, skiprows=2)
-    Stations_info['Lon2'] = Stations_info['Lon'] + 0.1
-    Stations_info['Lat2'] = Stations_info['Lat'] - 0.1
-
     # Process each station
     for i, row in Stations_info.iterrows():
+        # Log progress
+        logger.info(f"Processing station {row['ID']}")
         try:
             forecast = process_request(row,date_col)
             forecast_dataframe = concatenate_forecasts(forecast,date_col)
             past_forecast = load_past_forecast(path_to_save, f'{row["ID"]}_saved_forecast', date_col)
             final_forecast = combine_past_and_current_forecast(past_forecast, forecast_dataframe, date_col)
             final_forecast = fill_missing_hours(final_forecast, date_col)
-            save_forecast(forecast_dataframe, path_to_save, f'{row["ID"]}_saved_forecast')
+            final_forecast[forecast_variables] = final_forecast[forecast_variables].round(3)
+            save_forecast(final_forecast, path_to_save, f'{row["ID"]}_saved_forecast')
         except Exception as e:
             logger.error(f"Error processing station {row['ID']}: {e}")
 
-        # Log progress
-        logger.info(f"Processed station {row['ID']}")
-
-    elapsed_time = time.time() - start_time
-    logger.info(f"Script completed in {elapsed_time} seconds")
+    logger.info(f"Script completed in {time.time() - start_time} seconds")
 
 if __name__ == "__main__":
-    # Define path to configuration file
-    config_file_path = f'C:\\Users\\{os.getenv("USERNAME")}\\PycharmProjects\\GetWeatherData\\source\\Forecasts\\config.ini'
-    main(config_file_path)
+    config = load_config_file()
+    variables = config['General']
+    forecast_variables = [config['temp_col'], config['hr_col'], config['rain_col'], config['rad_col']]
+    main(config)

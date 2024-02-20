@@ -38,6 +38,7 @@ Notes:
 # TODO : Find some way to incorporate a percentage progress bar
 
 # imports
+from utils import load_eccc_forecast_config_file
 import sys
 import os
 import re
@@ -49,7 +50,6 @@ import pytz
 import numpy as np
 import pandas as pd
 import logging
-import configparser
 from owslib.util import ServiceException
 from owslib.wms import WebMapService
 
@@ -62,23 +62,6 @@ warnings.filterwarnings("ignore")
 wms_url = 'https://geo.weather.gc.ca/geomet/?SERVICE=WMS&REQUEST=GetFeatureInfo'
 wms = WebMapService(wms_url, version='1.3.0', timeout=300)
 common_var_names = ['TT', 'HR', 'PR', 'N4']  # These are the common variable names between the different forecast models
-
-
-def load_config_file():
-    # Get the directory of the current script
-    script_dir = os.path.dirname(os.path.realpath(__file__))
-
-    # Join the script directory with the name of the configuration file
-    config_file_path = os.path.join(script_dir, 'config.ini')
-
-    # Check if the configuration file exists
-    if not os.path.isfile(config_file_path):
-        raise FileNotFoundError(f"Configuration file does not exist: {config_file_path}")
-
-    config = configparser.ConfigParser()
-    config.read(config_file_path)
-
-    return config
 
 def request(layer: str, times: list, coor: list) -> list:
     pixel_values = []
@@ -284,7 +267,7 @@ def load_past_forecast(past_path: str, filename: str, date_col:str) -> pd.DataFr
     :return:
     """
 
-    # check if file exists. If it doesn'T return as empty dataframe
+    # check if file exists. If it doesn't return as empty dataframe
     filename = f"{past_path}\\{filename}.csv"
     if not os.path.isfile(filename):
         print('No file found, returning empty dataframe with columns DATE and TIME')
@@ -368,14 +351,10 @@ def save_forecast(forecast_df: pd.DataFrame, save_path: str, filename: str):
 
 # %% Read station information and process each station
 
-def main(config_path):
+def main(config):
     start_time = time.time()
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     logger = logging.getLogger(__name__)
-
-    # Load configuration
-    config = configparser.ConfigParser()
-    config.read(config_path)
 
     path_to_script = config.get('Paths', 'ScriptPath')
     path_to_save = config.get('Paths', 'SavedForecastsPath')
@@ -411,7 +390,7 @@ def main(config_path):
     logger.info(f"Script completed in {time.time() - start_time} seconds")
 
 if __name__ == "__main__":
-    config = load_config_file()
+    config = load_eccc_forecast_config_file()
     variables = config['General']
-    forecast_variables = [config['temp_col'], config['hr_col'], config['rain_col'], config['rad_col']]
+    forecast_variables = [variables['temp_col'], variables['hr_col'], variables['rain_col'], variables['rad_col']]
     main(config)

@@ -98,6 +98,6 @@ if __name__ == "__main__":
     # Define variables
     rain_col = "RAIN [mm]"
     rimpro_headers = ['DATE', 'TIME', 'AIRTEMP', 'AIRHUM', 'RAIN', 'GLOBALRAD']  # Note : DATE and TIME should not change    
-    forecast_variables = [config['temp_col'], config['hr_col'], config['rain_col'], config['rad_col']]
-        
+    variables = config['General']
+    forecast_variables = [variables['temp_col'], variables['hr_col'], variables['rain_col'], variables['rad_col']]
     process_forecasts(config)

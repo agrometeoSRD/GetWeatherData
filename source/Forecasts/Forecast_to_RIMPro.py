@@ -60,8 +60,8 @@ def to_RIMpro_format(df):
         **df['Date'].astype(str).str.rsplit(' ', n=1, expand=True).rename(columns={0: 'DATE', 1: 'TIME'}))
                     .loc[:, ['DATE', 'TIME'] + forecast_variables]
                     .rename(columns=dict(zip(['DATE', 'TIME'] + forecast_variables, rimpro_headers)))
-                    .replace({'DATE': {'-': '/'}})
                     .astype(str))
+    df_ForRIMpro['DATE'] = df_ForRIMpro['DATE'].str.replace("-","/") # dont know why I wasnt able to chain this function
 
     return df_ForRIMpro
 
@@ -81,7 +81,7 @@ def write_df_to_RIMpro_csv(df, path_output, staname, ID):
 def process_forecasts(config):
     
     paths = config['Paths']
-    station_file = os.path.join(paths['ScriptPath'], 'VStations_p1_test.dat')
+    station_file = os.path.join(paths['ScriptPath'], 'vs_stations_test.dat')
     station_info = pd.read_csv(station_file, skiprows=2)
 
     # Loop over all stations found in the station file

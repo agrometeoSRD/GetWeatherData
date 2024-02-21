@@ -7,7 +7,7 @@ Description:
 - Create a virtual station by saving HRDPS "nowcast (0-6 hours)" into a csv file for a specific coordinate
 - If the file already exists, it just adds on top of it
 - Searches for the most recent HRPDS forecast from saved_forecasts.csv
-- Adds this most recent forecast to the corresponding forecast in folder historical_forecast
+- Adds this most recent forecast to the corresponding forecast in folder vs_forecast
 
 Created: 2024-02-20
 """
@@ -26,7 +26,22 @@ import pandas as pd
 # Constants
 
 # Functions
-def load_forecast(past_path: str, filename: str, date_col:str) -> pd.DataFrame:
+def generate_dataframe(time_start,timesteps=24):
+    # time_start = '2024-02-20 00:00:00'
+    # Create date range
+    date_range = pd.date_range(start=time_start, periods=timesteps, freq='h')
+
+    # Create DataFrame
+    df = pd.DataFrame({
+        'Date': date_range,
+        'AIRTEMP [C]': np.random.uniform(-20, 20, timesteps),
+        'HR [percent]': np.random.uniform(0, 100, timesteps),
+        'RAIN [mm]': np.random.uniform(0, 1, timesteps),
+        'GLOBALRAD [Wm2]': np.random.uniform(0, 500, timesteps)
+    })
+    return df
+
+def load_forecast(path: str, filename: str, date_col:str) -> pd.DataFrame:
     """
     Only accepts csv files for now.
     csv should have an expected one row of header that will be skipped
@@ -39,26 +54,30 @@ def load_forecast(past_path: str, filename: str, date_col:str) -> pd.DataFrame:
     """
 
     # check if file exists. If it doesn't return as empty dataframe
-    filename = f"{past_path}\\{filename}.csv"
+    filename = f"{path}\\{filename}.csv"
     if not os.path.isfile(filename):
         print('No file found, returning empty dataframe with columns DATE and TIME')
         return pd.DataFrame(columns=[date_col] + forecast_variables)
     else:
-        df = pd.read_csv(filename, sep=None,dtype={date_col:'datetime64[ns]'})
-        if len(df.columns) > 1:
-            print("Detected separator: comma")
-        else:
-            df = pd.read_csv(f"{past_path}\\{filename}.csv", sep=';',dtype={date_col:'datetime64[ns]'})
-            print("Detected separator: semicolon")
+        df = pd.read_csv(filename,sep=None,engine='python',parse_dates=[date_col],dtype={
+                        variables['temp_col']: 'float64',
+                        variables['hr_col']: 'float64',
+                        variables['rain_col']: 'float64',
+                        variables['rad_col']: 'float64'
+                    })
     return df
 
 def load_most_recent_forecast(path: str, filename: str, date_col:str) -> pd.DataFrame:
     most_recent_forecast = load_forecast(path, filename, date_col)
+    # cut current_df so that only get 0 to 6 hours
+    time_init = most_recent_forecast.loc[0,date_col]
+    time_final = time_init+pd.Timedelta(hours=5)
+    most_recent_forecast = most_recent_forecast[(most_recent_forecast[date_col] >= time_init) & (most_recent_forecast[date_col] <= time_final)]
     return most_recent_forecast
 
-def load_historical_forecast(path : str,filename : str,date_col:str) -> pd.DataFrame:
-    historical_forecast = load_forecast(path,filename,date_col)
-    return historical_forecast
+def load_vs_forecast(path : str,filename : str,date_col:str) -> pd.DataFrame:
+    vs_forecast = load_forecast(path,filename,date_col)
+    return vs_forecast
 
 def combine_past_and_current_forecast(past_df: pd.DataFrame, current_df: pd.DataFrame,date_col:str) -> pd.DataFrame:
     # The function should work under the following conditions:
@@ -90,15 +109,8 @@ def combine_past_and_current_forecast(past_df: pd.DataFrame, current_df: pd.Data
     # Sort dataframes by date in chronological order
     past_df = past_df.sort_values(by=date_col, ascending=True)
     current_df = current_df.sort_values(by=date_col, ascending=True)
-    # cut current_df so that only get 0 to 6 hours
-    time_init = current_df.loc[date_col,0]
-    time_final = time_init+pd.Timedelta(hours=6)
-    current_df = current_df[(current_df[date_col] >= time_init) & (current_df[date_col] <= time_final)]
 
-    combined_df = (current_df.combine_first(past_df) # Combine dataframes, prioritizing current forecast
-                   .sort_values(by=date_col)   # Sort by date in ascending order
-                   .drop_duplicates(subset=date_col, keep='first')  # Remove duplicate rows
-                   )
+    combined_df = pd.concat([current_df, past_df]).sort_values(by=date_col).drop_duplicates(subset=date_col, keep='first')
 
     return combined_df
 
@@ -107,7 +119,7 @@ def fill_missing_hours(df, date_col):
     max_date = df[date_col].max()
 
     # Create a DatetimeIndex for every hour between min_date and max_date
-    full_index = pd.date_range(min_date, max_date, freq='H')
+    full_index = pd.date_range(min_date, max_date, freq='h')
 
     # Set the date column as the index of the dataframe
     df = (df.set_index(date_col)
@@ -130,17 +142,13 @@ def main(config):
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     logger = logging.getLogger(__name__)
 
-    # Load configuration
-    config = configparser.ConfigParser()
-    config.read(config)
-
     path_to_script = config.get('Paths', 'ScriptPath')
     path_to_current = config.get('Paths','SavedForecastsPath')
-    path_to_historical = config.get('Paths', 'SavedHistoricalForecastsPath')
+    path_to_vs = config.get('Paths', 'SavedvsForecastsPath')
     date_col = config.get('General', 'DateColumn')
 
     # Load station info
-    InFile = os.path.join(path_to_script, 'VStations_p1_test.dat')
+    InFile = os.path.join(path_to_script, 'vs_stations_test.dat')
     try:
         Stations_info = pd.read_csv(InFile, skiprows=2)
     except Exception as e:
@@ -148,15 +156,15 @@ def main(config):
         sys.exit(1)
 
     # Process each station
-    for i, row in Stations_info.iterrows():
+    for _, row in Stations_info.iterrows():
         # Log progress
         logger.info(f"Processing station {row['ID']}")
         try:
             current_forecast = load_most_recent_forecast(path_to_current,f'{row["ID"]}_saved_forecast',date_col)
-            historical_forecast = load_historical_forecast(path_to_historical,f'{row["ID"]}_historical',date_col)
-            combined_forecast = combine_past_and_current_forecast(historical_forecast,current_forecast,date_col)
+            vs_forecast = load_vs_forecast(path_to_vs,f'{row["ID"]}_vs',date_col)
+            combined_forecast = combine_past_and_current_forecast(vs_forecast,current_forecast,date_col)
             combined_forecast = fill_missing_hours(combined_forecast,date_col)
-            save_forecast(combined_forecast,path_to_historical,f'{row["ID"]}_historical')
+            save_forecast(combined_forecast,path_to_vs,f'{row["ID"]}_vs')
         except Exception as e:
             logger.error(f"Error processing station {row['ID']}: {e}")
 
@@ -166,5 +174,5 @@ def main(config):
 if __name__ == "__main__":
     config = load_eccc_forecast_config_file()
     variables = config['General']
-    forecast_variables = [config['temp_col'], config['hr_col'], config['rain_col'], config['rad_col']]
+    forecast_variables = [variables['temp_col'], variables['hr_col'], variables['rain_col'], variables['rad_col']]
     main(config)

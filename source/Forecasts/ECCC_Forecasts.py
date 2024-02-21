@@ -221,8 +221,7 @@ def concatenate_forecasts(forecast_dict: dict,date_col:str) -> pd.DataFrame:
 
     # merge all three dataframes. Also check for any missing hours between min and max dates and if so, fill with nans
     df_merged = (reduce(lambda left, right: pd.merge(left, right, on=['Date'], how='outer'),
-                        [forecast_dict['HRDPS'], forecast_dict['RDPS'], forecast_dict['GDPS']])
-                 .pipe(fill_missing_hours, date_col))
+                        [forecast_dict['HRDPS'], forecast_dict['RDPS'], forecast_dict['GDPS']]))
 
     # Currently df_merged is a single dataframe, but it has different columns for every forecast.
     # Create a list where each index is a specific variable (like PR) but it has all the different dataframes together
@@ -255,7 +254,7 @@ def fill_missing_hours(df, date_col):
     return df
 
 
-def load_past_forecast(past_path: str, filename: str, date_col:str) -> pd.DataFrame:
+def load_forecast(past_path: str, filename: str, date_col:str) -> pd.DataFrame:
     """
     Only accepts csv files for now.
     csv should have an expected one row of header that will be skipped
@@ -273,13 +272,12 @@ def load_past_forecast(past_path: str, filename: str, date_col:str) -> pd.DataFr
         print('No file found, returning empty dataframe with columns DATE and TIME')
         return pd.DataFrame(columns=[date_col] + forecast_variables)
     else:
-        df = pd.read_csv(filename, sep=None,dtype={date_col:'datetime64[ns]'})
-        if len(df.columns) > 1:
-            print("Detected separator: comma")
-        else:
-            df = pd.read_csv(f"{past_path}\\{filename}.csv", sep=';',dtype={date_col:'datetime64[ns]'})
-            print("Detected separator: semicolon")
-
+        df = pd.read_csv(filename,sep=None,engine='python',parse_dates=[date_col],dtype={
+                        variables['temp_col']: 'float64',
+                        variables['hr_col']: 'float64',
+                        variables['rain_col']: 'float64',
+                        variables['rad_col']: 'float64'
+                    })
     return df
 
 
@@ -321,12 +319,12 @@ def combine_past_and_current_forecast(past_df: pd.DataFrame, current_df: pd.Data
     first_date = current_df[date_col].iloc[0]
     past_matches = past_df[past_df[date_col] == first_date]
     # Check if there's a matching date in past_df and the RAIN value is not NaN
-    if not past_matches.empty and not pd.isna(past_matches[config['rain_col']].iloc[0]):
-        past_rain = past_matches[config['rain_col']].iloc[0]
+    if not past_matches.empty and not pd.isna(past_matches[variables['rain_col']].iloc[0]):
+        past_rain = past_matches[variables['rain_col']].iloc[0]
     else:
         past_rain = 0  # Default to 0 if no matching date or value is NaN
     # update current_df with the corresponding past_rain value
-    current_df.loc[current_df[date_col] == first_date, config['rain_col']] = past_rain
+    current_df.loc[current_df[date_col] == first_date, variables['rain_col']] = past_rain
 
     combined_df = (current_df.combine_first(past_df) # Combine dataframes, prioritizing current forecast
                     .sort_values(by=date_col)   # Sort by date in ascending order
@@ -361,7 +359,7 @@ def main(config):
     date_col = config.get('General', 'DateColumn')
 
     # Load station info
-    InFile = os.path.join(path_to_script, 'VStations_p1_test.dat')
+    InFile = os.path.join(path_to_script, 'vs_stations_test.dat')
     try:
         Stations_info = pd.read_csv(InFile, skiprows=2)
     except Exception as e:
@@ -379,7 +377,7 @@ def main(config):
         try:
             forecast = process_request(row,date_col)
             forecast_dataframe = concatenate_forecasts(forecast,date_col)
-            past_forecast = load_past_forecast(path_to_save, f'{row["ID"]}_saved_forecast', date_col)
+            past_forecast = load_forecast(path_to_save, f'{row["ID"]}_saved_forecast', date_col)
             final_forecast = combine_past_and_current_forecast(past_forecast, forecast_dataframe, date_col)
             final_forecast = fill_missing_hours(final_forecast, date_col)
             final_forecast[forecast_variables] = final_forecast[forecast_variables].round(3)

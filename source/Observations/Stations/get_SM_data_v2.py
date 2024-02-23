@@ -12,6 +12,8 @@ Description:
 
 Notes
 - By using CIPRA, we do not consider advance eastern time. Time is always UTC-5
+- To test directly on the CLI
+python script_name.py --stations "Compton" "Dunham" --years "2020" "2021" --save_path "./" --filename "test"
 
 Created: 2024-02-21
 """
@@ -23,7 +25,7 @@ import urllib
 import json
 import unidecode
 import datetime
-from typing import Dict,Union, List
+from typing import Dict,Union, Type, List, Any
 import numpy as np
 import pandas as pd
 
@@ -71,9 +73,10 @@ def define_years(years: Union[str, List[str]] = 'all') -> List[str]:
 def create_url(station_name:str,year:str) -> str:
 # will look like something like this :  url = f"http://http://meteo.irda.qc.ca//Cipra//{year}//{station_id}.BRU"
     url = f"http://meteo.irda.qc.ca/Cipra/{year}/{station_name}.BRU"
+    print("URL: ",url)
     return url
 
-def fetch_data(url:str,BRU_headers:list[str],column_types:Dict[str, Union[float, str]]) -> pd.DataFrame:
+def fetch_data(url:str,BRU_headers:list[str],column_types:Dict[Any, Type[float]]) -> pd.DataFrame:
     """
     Fetches weather station data from http://meteoirda.qc.ca/CIPRA
     """
@@ -129,25 +132,30 @@ def save_data(df:pd.DataFrame,save_path: str, filename: str) -> None:
     df.to_csv(out, index=False,na_rep=np.nan)
 
 # Main execution ---------------------------------------
-def main(station_names: List[str] = ['Compton'], years: List[str] = ['2020','2021'], save_path: str = "./", filename: str = "weather_data.csv"):
+# def main(station_names: List[str] = ['Compton'], years: List[str] = ['2020','2021'], save_path: str = "./", filename: str = "weather_data.csv"):
+#     with open('config.json', 'r') as f:
+#         config = json.load(f)
+#
+#     df_all_stations = download_and_process_data(station_names, years, config)
+#     save_data(df_all_stations, save_path, filename)
+
+def main(args):
     with open('config.json', 'r') as f:
         config = json.load(f)
 
-    df_all_stations = download_and_process_data(station_names, years, config)
-    save_data(df_all_stations, save_path, filename)
+    df_all_stations = download_and_process_data(args.stations,args.years,config)
+    save_data(df_all_stations,args.save_path,args.filename)
 
-def parse_arg(args):
+def parser_args(args=None):
     parser = argparse.ArgumentParser(description="Download and process weather station data.")
-    parser.add_argument("--stations", nargs="+", help="List of station names")
-    parser.add_argument("--years", nargs="+", help="List of years")
-    parser.add_argument("--save_path", help="Path to save the output CSV")
-    parser.add_argument("--filename", help="Filename for the output CSV")
+    # the + specifies that there can be multiple arguments and to store those as a list
+    parser.add_argument("--stations", nargs="+",default=['Compton','Dunham'], help="List of station names")
+    parser.add_argument("--years", nargs="+", default=['2020','2021'],help="List of years")
+    parser.add_argument("--save_path", default='./',help="Path to save the output CSV")
+    parser.add_argument("--filename", default='Compton_station',help="Filename for the output CSV (no extension)")
     return parser.parse_args(args)
 
 
 if __name__ == "__main__":
-    parser = parse_arg(sys.argv[1:]) # first element represents the script name is removed
-    main(args.stations, args.years, args.save_path, args.filename)
-
-
-
+    args = parser_args()
+    main(args)

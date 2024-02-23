@@ -1,0 +1,153 @@
+"""
+File: get_SM_data_v2.py
+Author: sebastien.durocher
+Email: sebastien.rougerie-durocher@irda.qc.ca
+Github: https://github.com/MorningGlory747
+Description:
+- Fetches weather station data from http meteoirda/CIPRA (using CIPRA and not 4z, because CIPRA its easier to use)
+- Weather station data is stored as .BRU file. This has specific formatting that needs to be taken into account
+- Code allows loading of multiple .BRU files and concatenates them into a single dataframe
+- To find out which stations are available, use a specific file that stores the information (reseau_sm.csv)
+- Stored as a pandas and saved following a specific weather station format
+
+Notes
+- By using CIPRA, we do not consider advance eastern time. Time is always UTC-5
+
+Created: 2024-02-21
+"""
+
+# Import statements
+import sys
+import argparse
+import urllib
+import json
+import unidecode
+import datetime
+from typing import Dict,Union, List
+import numpy as np
+import pandas as pd
+
+# Constants
+
+# Functions
+def set_column_types(config):
+    column_types = {col: float for col in config["BRU_num_headers"]}
+    column_types.update({col: str for col in config["BRU_date_headers"]})
+    return column_types
+
+def convert_time(df:pd.DataFrame) -> pd.DataFrame:
+    df['Hour'] = df['Hour'].astype(str).str.zfill(4) # pad with 0s
+    df = (df.assign(Datetime = df['Year'].astype(str) +'-'+ df['Day'].astype(str) +'-'+ df['Hour'])
+            .assign(Datetime = lambda df: pd.to_datetime(df['Datetime'], format='%Y-%j-%H%M'))
+            .drop(columns=['Year', 'Day', 'Hour'])
+          )
+    # palce datetime as first column
+    cols = df.columns.tolist()
+    cols = cols[-1:] + cols[:-1]
+    df = df[cols]
+    return df
+
+def define_station_names(station_names: list[str]) -> list[str]:
+    # Function that checks to make sure names are properly formatted for the url
+
+    # Make sure Station_names is list and names within are strings
+    if isinstance(station_names, list) == False and all(isinstance(x, str) for x in station_names) == False:
+        raise TypeError('Hey! Input station_names should be a list of strings.')
+
+    # Replace blank spaces with underscores for names
+    station_names = [name.replace(' ', '_') for name in station_names]
+    # remove accents
+    station_names = [unidecode.unidecode(el) for el in station_names]
+
+    return station_names
+def define_years(years: Union[str, List[str]] = 'all') -> List[str]:
+    if years == 'all':
+        return list(map(str, range(2000, int(datetime.datetime.now().year) + 1)))
+    elif isinstance(years, list) and all(isinstance(x, str) for x in years):
+        return years
+    else:
+        raise TypeError('Input years must be a list and the years within must be strings')
+
+def create_url(station_name:str,year:str) -> str:
+# will look like something like this :  url = f"http://http://meteo.irda.qc.ca//Cipra//{year}//{station_id}.BRU"
+    url = f"http://meteo.irda.qc.ca/Cipra/{year}/{station_name}.BRU"
+    return url
+
+def fetch_data(url:str,BRU_headers:list[str],column_types:Dict[str, Union[float, str]]) -> pd.DataFrame:
+    """
+    Fetches weather station data from http://meteoirda.qc.ca/CIPRA
+    """
+
+    try:
+        df = pd.read_csv(url, names=BRU_headers, dtype=column_types,engine='python')
+    except urllib.error.HTTPError as e:
+        df = pd.DataFrame(columns=BRU_headers)
+        if e.code == 404:
+            print("HTTP Error 404: File Not Found. Returning empty dataframe.")
+        else:
+            raise Exception(f"Undocumented error occured: {str(e)}")
+    return df
+
+def process_data(df:pd.DataFrame) -> pd.DataFrame:
+    """
+    Processes the weather station data
+    """
+    #TODO : Add more processing
+
+    # filter variables if specified
+
+    # create date column
+    df = convert_time(df)
+
+    # convert -991 to nan
+    df = df.replace(-991, np.nan)  # Convert -991 to nan
+
+    return df
+
+def download_and_process_data(station_names: List[str], years: List[str], config: Dict):
+    df_list = []
+    BRU_headers = config["BRU_date_headers"] + config["BRU_num_headers"]
+    for station in station_names:
+        for year in years:
+            url = create_url(station, year)
+            df = fetch_data(url, BRU_headers, set_column_types(config))
+            df_list.append(df)
+
+    df_all_stations = pd.concat(df_list)
+    df_all_stations = process_data(df_all_stations)
+    return df_all_stations
+
+def save_data(df:pd.DataFrame,save_path: str, filename: str) -> None:
+    """
+    Saves the weather station data
+    """
+    #TODO : Add more saving options
+
+    # Save as csv
+    out = f"{save_path}\\{filename}.csv"
+    print(f'Saving station file to : {out}')
+    df.to_csv(out, index=False,na_rep=np.nan)
+
+# Main execution ---------------------------------------
+def main(station_names: List[str] = ['Compton'], years: List[str] = ['2020','2021'], save_path: str = "./", filename: str = "weather_data.csv"):
+    with open('config.json', 'r') as f:
+        config = json.load(f)
+
+    df_all_stations = download_and_process_data(station_names, years, config)
+    save_data(df_all_stations, save_path, filename)
+
+def parse_arg(args):
+    parser = argparse.ArgumentParser(description="Download and process weather station data.")
+    parser.add_argument("--stations", nargs="+", help="List of station names")
+    parser.add_argument("--years", nargs="+", help="List of years")
+    parser.add_argument("--save_path", help="Path to save the output CSV")
+    parser.add_argument("--filename", help="Filename for the output CSV")
+    return parser.parse_args(args)
+
+
+if __name__ == "__main__":
+    parser = parse_arg(sys.argv[1:]) # first element represents the script name is removed
+    main(args.stations, args.years, args.save_path, args.filename)
+
+
+

@@ -23,6 +23,8 @@ import sys
 import argparse
 import urllib
 import json
+from importlib import resources # avoids hardocding the path
+import logging
 import unidecode
 import datetime
 from typing import Dict,Union, Type, List, Any
@@ -30,8 +32,29 @@ import numpy as np
 import pandas as pd
 
 # Constants
+# Configure basic logging
+logging.basicConfig(level=logging.INFO,format='%asctime)s - %(levelname)s - %(message)s',datefmt='%Y-%m-%d %H:%M:%S')
+logger = logging.getLogger(__name__)
 
 # Functions
+def load_config(config_path=None):
+    try:
+        logging.info("Configuration loaded successfully")
+        if config_path is None:
+            # Access the default configuration as a package resource
+            with resources.open_text('source.Observations.Stations', 'config.json') as f:
+                return json.load(f)
+        else:
+            # load configuration from a user-specified path
+            with open(config_path, 'r') as f:
+                return json.load(f)
+    except FileNotFoundError:
+        logging.error('Configuration file not found')
+
+    except Exception as e:
+        logging.error(f"An error occured while loading the configuration file: {str(e)}")
+
+
 def set_column_types(config):
     column_types = {col: float for col in config["BRU_num_headers"]}
     column_types.update({col: str for col in config["BRU_date_headers"]})
@@ -86,7 +109,7 @@ def fetch_data(url:str,BRU_headers:list[str],column_types:Dict[Any, Type[float]]
     except urllib.error.HTTPError as e:
         df = pd.DataFrame(columns=BRU_headers)
         if e.code == 404:
-            print("HTTP Error 404: File Not Found. Returning empty dataframe.")
+            logger.error(f"HTTP Error 404: File Not Found. Returning empty dataframe.")
         else:
             raise Exception(f"Undocumented error occured: {str(e)}")
     return df
@@ -107,7 +130,10 @@ def process_data(df:pd.DataFrame) -> pd.DataFrame:
 
     return df
 
-def download_and_process_data(station_names: List[str], years: List[str], config: Dict):
+def download_and_process_data(station_names: List[str], years: List[str], config: Dict = None):
+    if config is None:
+        config = load_config()
+
     df_list = []
     BRU_headers = config["BRU_date_headers"] + config["BRU_num_headers"]
     for station in station_names:
@@ -128,21 +154,12 @@ def save_data(df:pd.DataFrame,save_path: str, filename: str) -> None:
 
     # Save as csv
     out = f"{save_path}\\{filename}.csv"
-    print(f'Saving station file to : {out}')
+    logger.info(f'Saving station file to : {out}')
     df.to_csv(out, index=False,na_rep=np.nan)
 
 # Main execution ---------------------------------------
-# def main(station_names: List[str] = ['Compton'], years: List[str] = ['2020','2021'], save_path: str = "./", filename: str = "weather_data.csv"):
-#     with open('config.json', 'r') as f:
-#         config = json.load(f)
-#
-#     df_all_stations = download_and_process_data(station_names, years, config)
-#     save_data(df_all_stations, save_path, filename)
-
 def main(args):
-    with open('config.json', 'r') as f:
-        config = json.load(f)
-
+    config=load_config()
     df_all_stations = download_and_process_data(args.stations,args.years,config)
     save_data(df_all_stations,args.save_path,args.filename)
 

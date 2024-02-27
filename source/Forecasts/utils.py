@@ -20,7 +20,7 @@ def load_eccc_forecast_config_file():
     script_dir = os.path.dirname(os.path.realpath(__file__))
 
     # Join the script directory with the name of the configuration file
-    config_file_path = os.path.join(script_dir, 'config.ini')
+    config_file_path = os.path.join(script_dir, 'ec_config.ini')
 
     # Check if the configuration file exists
     if not os.path.isfile(config_file_path):

@@ -1,104 +1,179 @@
-import os,glob
+"""
+File: get_SM_data.py
+Author: sebastien.durocher
+Email: sebastien.rougerie-durocher@irda.qc.ca
+Github: https://github.com/MorningGlory747
+Description:
+- Fetches weather station data from http meteoirda/CIPRA (using CIPRA and not 4z, because CIPRA its easier to use)
+- Weather station data is stored as .BRU file. This has specific formatting that needs to be taken into account
+- Code allows loading of multiple .BRU files and concatenates them into a single dataframe
+- To find out which stations are available, use a specific file that stores the information (reseau_sm.csv)
+- Stored as a pandas and saved following a specific weather station format
+
+Notes
+- By using CIPRA, we do not consider advance eastern time. Time is always UTC-5
+- To test directly on the CLI
+python script_name.py --stations "Compton" "Dunham" --years "2020" "2021" --save_path "./" --filename "test"
+
+Created: 2024-02-21
+"""
+
+# Import statements
+import sys
+import argparse
+import urllib
+import json
+from importlib import resources # avoids hardocding the path
+import logging
+import unidecode
 import datetime
+from typing import Dict,Union, Type, List, Any
 import numpy as np
 import pandas as pd
-import geopandas as gpd
-from shapely.geometry import Point
-from typing import Union
-import pathlib
 
+# Constants
+# Configure basic logging
+logging.basicConfig(level=logging.INFO,format='%asctime)s - %(levelname)s - %(message)s',datefmt='%Y-%m-%d %H:%M:%S')
+logger = logging.getLogger(__name__)
 
-# open csv file from the same folder as this script
-# TODO : maybe put this in a function or something
-station_filename = r"reseau_agro.csv"
-p = pathlib.Path(__file__).with_name(station_filename)
-# Check if file doesn't exist
-if not p.exists():
- raise FileNotFoundError(f'File not found: {p}')
-
-# Read geopolygon file
-# TODO : place this line somewhere else, because don't always have to load a geopolygon. Also make it less "hardcoded"
-gpd.io.file.fiona.drvsupport.supported_drivers['LIBKML'] = 'rw'
-polygon_gdf = gpd.read_file(r"C:\Users\sebastien.durocher\OneDrive - IRDA\Chargé de projets\Petits projets\Marc-Olivier\Projet 10033\BV_BaieMissisquoi_Uni.kml")
-
-def get_station_coords_within_area(csv_filepath: str, polygon_gdf: gpd.GeoDataFrame, lat_col: str ='Lat', lon_col: str='Lon') -> Union[pd.DataFrame, None]:
-# lat_col = 'Lat'
-# lon_col = 'Lon'
-    # Read CSV file
-     df = pd.read_csv(csv_filepath,sep=';')
-
-     # Convert DataFrame to GeoDataFrame
-     geometry = [Point(xy) for xy in zip(df[lon_col], df[lat_col])]
-     geo_df = gpd.GeoDataFrame(df, geometry=geometry, crs="EPSG:4326")
-
-     # Filter out points within the multipolygon
-     points_in_polygon = gpd.sjoin(geo_df, polygon_gdf, how="inner", op="within")
-
-     return points_in_polygon
-
-ans = get_station_coords_within_area(p, polygon_gdf)
-
-def convert_time(inputime):
+# Functions
+def load_config(config_path=None):
     try:
-        mod_time = inputime[:-3] + ''.join(str(inputime[-3:]).split('00')[:])
-        # Need to do this because split takes the first 00 it sees, meaning at 10:00, it will take the first 2 zeros.
-        mod_time = str(datetime.datetime.strptime(mod_time, '%Y-%j-%H'))
-    except ValueError:
-        print('Doesn''t work for ', inputime)
-    return mod_time
-def load_data():
-    # This was made specifically for Marc-Olivier. Not universal. Waiting for update on the M.
+        logging.info("Configuration loaded successfully")
+        if config_path is None:
+            # Access the default configuration as a package resource
+            with resources.open_text('source.Observations.Stations', 'config.json') as f:
+                return json.load(f)
+        else:
+            # load configuration from a user-specified path
+            with open(config_path, 'r') as f:
+                return json.load(f)
+    except FileNotFoundError:
+        logging.error('Configuration file not found')
 
-    path = "D:\\Observations\\Stations\\Marc-Olivier\\"
-    myHeaders = ['Year', 'Day', 'Hour', 'Num', 'TMax', 'TMin', 'TMoy', 'HR', 'PR', 'PR_start', 'InSW', 'Tair_5',
-              'TGr_5', 'TGr_10',
-              'TGr_20', 'TGr_50', 'Wind', 'WindDir', 'Pressure', 'Mouillure_feuil', 'Mouillure_feuil_thres',
-              'no_data', 'no_data2']
-    # Load all .BRU files within that path as pandas csv. Add a new colum named "filename" with the name of the file
-    df_l = []
-    for f in glob.glob(os.path.join(path,"*.BRU")):
-      df_p = pd.read_csv(f,encoding='latin-1',names=myHeaders)
-      df_p['Name'] = f.split('\\')[-1].split(' ')[0]
-      df_l.append(df_p)
+    except Exception as e:
+        logging.error(f"An error occured while loading the configuration file: {str(e)}")
 
-    Station_df = pd.concat(df_l).reset_index(drop=True)
-    Station_df = Station_df.assign(
-     Date=Station_df.Year.astype(str) + '-' + Station_df.Day.astype(int).astype(str) + '-' +
-          Station_df.Hour.astype(int).astype(str))  # Merge time together
-    Station_df['Date'] = Station_df['Date'].apply(convert_time)
-    Station_df = Station_df.drop(columns=['Year', 'Day', 'Hour'])  # Remove first 3 columns
-    Station_df['Date'] = pd.to_datetime(Station_df['Date'])
-    Station_df = Station_df.sort_values(by=['Name', 'Date']).reset_index(drop=True)
-    Station_df = Station_df.replace(-991, np.nan)  # Convert -991 to nan
 
-    # compute daily mean for TMax, TMin, TMoy, HR, Wind, WindDir, Pressure
-    mean_cols = ['TMoy', 'HR', 'Wind', 'WindDir', 'Pressure']
-    mean_dict = {col: 'mean' for col in mean_cols}
-    # compute daily sums for Pr and InSW
-    sum_cols = ['PR', 'InSW']
-    sum_dict = {col: 'sum' for col in sum_cols}
-    # for min and max temp, select min and max of hourly mean temperature within the day
-    min_dict = {'TMin':'min'}
-    max_dict = {'TMax':'max'}
-    # join dictionaries
-    agg_dict = {**mean_dict, **sum_dict,**min_dict,**max_dict}
-    Station_df[mean_cols] = Station_df[mean_cols].astype(float)
-    Station_df[sum_cols] = Station_df[sum_cols].astype(float)
-    Station_df_daily = Station_df.groupby(['Name', pd.Grouper(key='Date', freq='D')]).agg(agg_dict).reset_index()
+def set_column_types(config):
+    column_types = {col: float for col in config["BRU_num_headers"]}
+    column_types.update({col: str for col in config["BRU_date_headers"]})
+    return column_types
 
-    # Some strings in column Name have .BRU at the end. Remove it
-    Station_df_daily['Name'] = Station_df_daily['Name'].str.replace('.BRU', '')
+def convert_time(df:pd.DataFrame) -> pd.DataFrame:
+    df['Hour'] = df['Hour'].astype(str).str.zfill(4) # pad with 0s
+    df = (df.assign(Datetime = df['Year'].astype(str) +'-'+ df['Day'].astype(str) +'-'+ df['Hour'])
+            .assign(Datetime = lambda df: pd.to_datetime(df['Datetime'], format='%Y-%j-%H%M'))
+            .drop(columns=['Year', 'Day', 'Hour'])
+          )
+    # palce datetime as first column
+    cols = df.columns.tolist()
+    cols = cols[-1:] + cols[:-1]
+    df = df[cols]
+    return df
 
-    # drop missing nans
-    Station_df_daily = Station_df_daily.dropna()
+def define_station_names(station_names: list[str]) -> list[str]:
+    # Function that checks to make sure names are properly formatted for the url
 
-    # sort by dates
-    Station_df_daily = Station_df_daily.sort_values(by=['Name', 'Date']).reset_index(drop=True)
+    # Make sure Station_names is list and names within are strings
+    if isinstance(station_names, list) == False and all(isinstance(x, str) for x in station_names) == False:
+        raise TypeError('Hey! Input station_names should be a list of strings.')
 
-    # round mean_cols and sum_cols
-    Station_df_daily[mean_cols] = Station_df_daily[mean_cols].round(2)
-    Station_df_daily[sum_cols] = Station_df_daily[sum_cols].round(2)
+    # Replace blank spaces with underscores for names
+    station_names = [name.replace(' ', '_') for name in station_names]
+    # remove accents
+    station_names = [unidecode.unidecode(el) for el in station_names]
 
-    # Get unique of Station_df['Name'] and write csv files for each station
-    for station in Station_df_daily['Name'].unique():
-        Station_df_daily[Station_df_daily['Name'] == station].to_csv(f"C:\\temp\\{station}.csv", index=False)
+    return station_names
+
+def define_years(years: Union[str, List[str]] = 'all') -> List[str]:
+    if years == 'all':
+        return list(map(str, range(2000, int(datetime.datetime.now().year) + 1)))
+    elif isinstance(years, list) and all(isinstance(x, str) for x in years):
+        return years
+    else:
+        raise TypeError('Input years must be a list and the years within must be strings')
+
+def create_url(station_name:str,year:str) -> str:
+# will look like something like this :  url = f"http://http://meteo.irda.qc.ca//Cipra//{year}//{station_id}.BRU"
+    url = f"http://meteo.irda.qc.ca/Cipra/{year}/{station_name}.BRU"
+    print("URL: ",url)
+    return url
+
+def fetch_data(url:str,BRU_headers:list[str],column_types:Dict[Any, Type[float]]) -> pd.DataFrame:
+    """
+    Fetches weather station data from http://meteoirda.qc.ca/CIPRA
+    """
+
+    try:
+        df = pd.read_csv(url, names=BRU_headers, dtype=column_types,engine='python')
+    except urllib.error.HTTPError as e:
+        df = pd.DataFrame(columns=BRU_headers)
+        if e.code == 404:
+            logger.error(f"HTTP Error 404: File Not Found. Returning empty dataframe.")
+        else:
+            raise Exception(f"Undocumented error occured: {str(e)}")
+    return df
+
+def process_data(df:pd.DataFrame) -> pd.DataFrame:
+    """
+    Processes the weather station data
+    """
+    #TODO : Add more processing
+
+    # filter variables if specified
+
+    # create date column
+    df = convert_time(df)
+
+    # convert -991 to nan
+    df = df.replace(-991, np.nan)  # Convert -991 to nan
+
+    return df
+
+def download_and_process_data(station_names: List[str], years: List[str], config: Dict = None):
+    if config is None:
+        config = load_config()
+
+    df_list = []
+    BRU_headers = config["BRU_date_headers"] + config["BRU_num_headers"]
+    for station in station_names:
+        for year in years:
+            url = create_url(station, year)
+            df = fetch_data(url, BRU_headers, set_column_types(config))
+            df_list.append(df)
+
+    df_all_stations = pd.concat(df_list)
+    df_all_stations = process_data(df_all_stations)
+    return df_all_stations
+
+def save_data(df:pd.DataFrame,save_path: str, filename: str) -> None:
+    """
+    Saves the weather station data
+    """
+    #TODO : Add more saving options
+
+    # Save as csv
+    out = f"{save_path}\\{filename}.csv"
+    logger.info(f'Saving station file to : {out}')
+    df.to_csv(out, index=False,na_rep=np.nan)
+
+# Main execution ---------------------------------------
+def main(args):
+    config=load_config()
+    df_all_stations = download_and_process_data(args.stations,args.years,config)
+    save_data(df_all_stations,args.save_path,args.filename)
+
+def parser_args(args=None):
+    parser = argparse.ArgumentParser(description="Download and process weather station data.")
+    # the + specifies that there can be multiple arguments and to store those as a list
+    parser.add_argument("--stations", nargs="+",default=['Compton','Dunham'], help="List of station names")
+    parser.add_argument("--years", nargs="+", default=['2020','2021'],help="List of years")
+    parser.add_argument("--save_path", default='./',help="Path to save the output CSV")
+    parser.add_argument("--filename", default='Compton_station',help="Filename for the output CSV (no extension)")
+    return parser.parse_args(args)
+
+
+if __name__ == "__main__":
+    args = parser_args()
+    main(args)

@@ -1,5 +1,5 @@
 """
-File: save_eccc_nowcast.py
+File: save_ec_nowcast.py
 Author: sebastien.durocher
 Email: sebastien.rougerie-durocher@irda.qc.ca
 Github: https://github.com/MorningGlory747

@@ -5,7 +5,7 @@ Creator : the_l
 Python version : 3.10
 
 Description:
-- This is a direct copy of Forecast_to_RIMPro.py
+- This is a direct copy of forecast_to_rimpro.py
 - 2024-02-21 : as of now, the only difference is the different paths
 
 Notes:
@@ -37,7 +37,7 @@ def load_config_file():
     script_dir = os.path.dirname(os.path.realpath(__file__))
 
     # Join the script directory with the name of the configuration file
-    config_file_path = os.path.join(script_dir, 'config.ini')
+    config_file_path = os.path.join(script_dir, 'ec_config.ini')
 
     # Check if the configuration file exists
     if not os.path.isfile(config_file_path):

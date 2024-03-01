@@ -100,6 +100,9 @@ def create_url(station_name:str,year:str) -> str:
     print("URL: ",url)
     return url
 
+def rename_columns(df:pd.DataFrame,config:Dict) -> pd.DataFrame:
+    pass
+
 def fetch_data(url:str,BRU_headers:list[str],column_types:Dict[Any, Type[float]]) -> pd.DataFrame:
     """
     Fetches weather station data from http://meteoirda.qc.ca/CIPRA

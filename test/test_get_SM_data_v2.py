@@ -13,7 +13,7 @@ Created: 2024-02-23
 import unittest
 from unittest.mock import patch, mock_open
 import sys
-from source.Observations.Stations.get_SM_data_v2 import *
+from source.Observations.Stations.get_SM_data import *
 
 # Constants
 
@@ -37,7 +37,7 @@ class TestArgparse(unittest.TestCase):
         self.parser = main.parser_args([])
 
     def test_years(self):
-        sys.argv = ['get_SM_data_v2.py', '--years', '2020', '2021']
+        sys.argv = ['get_SM_data.py', '--years', '2020', '2021']
         args = self.parser.parse_args()
         self.assertEqual(args.years, ['2020', '2021'])
 

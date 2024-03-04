@@ -1,3 +1,5 @@
+# Note : this script is not working as expected. Loading time speed has not increased.
+# Not recommended to use this script to download forecast data (see ec_forecasts.py)
 
 # imports
 import os

@@ -38,7 +38,7 @@ Notes:
 # TODO : Find some way to incorporate a percentage progress bar
 
 # imports
-from source.utils.utils import load_eccc_forecast_config_file
+# from source.utils.utils import load_eccc_forecast_config_file
 import sys
 import os
 import re
@@ -55,13 +55,17 @@ from owslib.wms import WebMapService
 
 warnings.filterwarnings("ignore")
 
-# %% Testing out chatgpt stuff
 # constants
 # Function to request weather data for a given layer, time, and coordinates
 wms_url = 'https://geo.weather.gc.ca/geomet/?SERVICE=WMS&REQUEST=GetFeatureInfo'
 wms = WebMapService(wms_url, version='1.3.0', timeout=300)
 common_var_names = ['TT', 'HR', 'PR', 'N4']  # These are the common variable names between the different forecast models
 
+# Functions
+
+def get_absolute_path(relative_path: str) -> str:
+    script_dir = os.path.dirname(__file__) # Get directory of the current script location
+    return os.path.join(script_dir,relative_path)
 
 def request(layer: str, times: list, coor: list) -> list:
     pixel_values = []

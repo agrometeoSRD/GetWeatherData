@@ -3,7 +3,8 @@
     "ScriptPath": "./source/Forecasts",
     "SavedEcForecastsPath": "./source/Forecasts/saved_forecasts",
     "SavedEcVsForecastsPath": "./source/Forecasts/saved_vs_forecasts",
-    "SavedRIMproPath": "./source/Forecasts/rimpro_format"
+    "SavedRIMproPath": "./source/Forecasts/rimpro_format",
+    "TestPath": "./test"
   },
   "General": {
     "DateColumn": "Date",

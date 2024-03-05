@@ -32,13 +32,10 @@ Notes:
 # TODO : Create automatic file to get acces to station data. Add the necessary errors to make sure the data is there
 # TODO : Test fonctions for anomalous data
 # TODO : Test forecast with multiple stations
-# TODO : Create a seperate script that would accept the forecast data and convert it into RIMpro
-# TODO : Apply asyncio to the script
-# TODO : Create some kind of secondary dictionnary that associates each variable with its corresponding forecast variable, that way the user can easily specify the variables that he wants and then the code will get the corresponding layers
 # TODO : Find some way to incorporate a percentage progress bar
 
 # imports
-# from source.utils.utils import load_eccc_forecast_config_file
+from utils.utils import load_config
 import sys
 import os
 import re
@@ -62,10 +59,6 @@ wms = WebMapService(wms_url, version='1.3.0', timeout=300)
 common_var_names = ['TT', 'HR', 'PR', 'N4']  # These are the common variable names between the different forecast models
 
 # Functions
-
-def get_absolute_path(relative_path: str) -> str:
-    script_dir = os.path.dirname(__file__) # Get directory of the current script location
-    return os.path.join(script_dir,relative_path)
 
 def request(layer: str, times: list, coor: list) -> list:
     pixel_values = []
@@ -341,12 +334,13 @@ def main(config):
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     logger = logging.getLogger(__name__)
 
-    path_to_script = config.get('Paths', 'ScriptPath')
-    path_to_save = config.get('Paths', 'SavedForecastsPath')
-    date_col = config.get('General', 'DateColumn')
+    path_to_script = config['Paths']['ScriptPath']
+    path_to_save = config['Paths']["SavedEcForecastsPath"]
+    date_col = config['General']['DateColumn']
 
     # Load station info
-    InFile = os.path.join(path_to_script, 'vs_stations_test.dat')
+    # InFile = os.path.join(path_to_script, 'VStations_p1.dat') uncomment for deployment
+    InFile = os.path.join(config['Paths']['TestPath'], 'vs_stations_test.dat')
     try:
         Stations_info = pd.read_csv(InFile, skiprows=2)
     except Exception as e:
@@ -376,7 +370,7 @@ def main(config):
 
 
 if __name__ == "__main__":
-    config = load_eccc_forecast_config_file()
+    config = load_config('ec_config.json')
     variables = config['General']
     forecast_variables = [variables['temp_col'], variables['hr_col'], variables['rain_col'], variables['rad_col']]
     main(config)

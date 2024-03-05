@@ -9,24 +9,34 @@ Created: 2024-03-04
 
 # Import statements
 import os
-import configparser
+from pathlib import Path
+import json
 
 # Constants
 
 # Functions
-def load_eccc_forecast_config_file():
-    # Get the directory of the current script
-    script_dir = os.path.dirname(os.path.realpath(__file__))
 
-    # Join the script directory with the name of the configuration file
-    config_file_path = os.path.join(script_dir, 'config.ini')
+def get_project_root(current_directory: Path) -> Path:
+    if (current_directory / 'config').exists():
+        return current_directory
+    parent_directory = current_directory.parent
+    if parent_directory == current_directory:
+        raise FileNotFoundError("Failed to find the project root directory.")
+    return get_project_root(parent_directory)
+
+def load_config(config_filename: str = "config.json"):
+    # Get the directory of the root folder
+    project_root = get_project_root(Path(__file__).parent)
+
+    # Get the path to the configuration file
+    config_path = project_root / 'config' / config_filename
 
     # Check if the configuration file exists
-    if not os.path.isfile(config_file_path):
-        raise FileNotFoundError(f"Configuration file does not exist: {config_file_path}")
+    if not os.path.isfile(config_path):
+        raise FileNotFoundError(f"Configuration file does not exist: {config_path}")
 
-    config = configparser.ConfigParser()
-    config.read(config_file_path)
+    with open(config_path, 'r') as f:
+         config = json.load(f)
 
     return config
 

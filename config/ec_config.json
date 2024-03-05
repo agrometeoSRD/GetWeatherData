@@ -1,0 +1,15 @@
+{
+  "Paths": {
+    "ScriptPath": "./source/Forecasts",
+    "SavedEcForecastsPath": "./source/Forecasts/saved_forecasts",
+    "SavedEcVsForecastsPath": "./source/Forecasts/saved_vs_forecasts",
+    "SavedRIMproPath": "./source/Forecasts/rimpro_format"
+  },
+  "General": {
+    "DateColumn": "Date",
+    "rain_col": "RAIN [mm]",
+    "temp_col": "AIRTEMP [C]",
+    "hr_col": "HR [percent]",
+    "rad_col": "GLOBALRAD [Wm2]"
+  }
+}

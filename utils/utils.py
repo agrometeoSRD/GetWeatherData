@@ -38,7 +38,20 @@ def load_config(config_filename: str = "config.json"):
     with open(config_path, 'r') as f:
          config = json.load(f)
 
+    # Attach the paths from config to the root path of the project
+    for key, path in config['Paths'].items():
+        absolute_path = (project_root / path).resolve()
+        config['Paths'][key] = str(absolute_path)
+
     return config
+
+def invert_mapping(mapping:dict):
+    'takes a dictionnary (expected from column_names.json) and inverts it'
+    inverted_map = {} # initialise the inverted map
+    for standard, variations in mapping.items(): # loop over each ke
+        for variation in variations: # loop over its possible variation
+            inverted_map[variation] = standard
+    return inverted_map
 
 # Main execution ---------------------------------------
 

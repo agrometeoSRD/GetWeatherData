@@ -15,13 +15,12 @@ Created: 2024-02-20
 # Import statements
 import sys
 import os
-import configparser
-from utils import load_eccc_forecast_config_file
 import logging
 import time
-
 import numpy as np
 import pandas as pd
+
+from utils.utils import load_config
 
 # Constants
 
@@ -142,13 +141,15 @@ def main(config):
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     logger = logging.getLogger(__name__)
 
-    path_to_script = config.get('Paths', 'ScriptPath')
-    path_to_current = config.get('Paths','SavedForecastsPath')
-    path_to_vs = config.get('Paths', 'SavedvsForecastsPath')
-    date_col = config.get('General', 'DateColumn')
+
+    path_to_script = config['Paths']['ScriptPath']
+    path_to_current = config['Paths']["SavedEcForecastsPath"]
+    path_to_vs = config['Paths']["SavedEcVsForecastsPath"]
+    date_col = config['General']['DateColumn']
 
     # Load station info
-    InFile = os.path.join(path_to_script, 'vs_stations_test.dat')
+    # InFile = os.path.join(path_to_script, 'VStations_p1.dat') uncomment for deployment
+    InFile = os.path.join(config['Paths']['TestPath'], 'vs_stations_test.dat')
     try:
         Stations_info = pd.read_csv(InFile, skiprows=2)
     except Exception as e:
@@ -172,7 +173,7 @@ def main(config):
 # Main execution --------------------------------------
 
 if __name__ == "__main__":
-    config = load_eccc_forecast_config_file()
+    config = load_config('ec_config.json')
     variables = config['General']
     forecast_variables = [variables['temp_col'], variables['hr_col'], variables['rain_col'], variables['rad_col']]
     main(config)

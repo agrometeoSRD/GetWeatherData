@@ -23,26 +23,11 @@ FRP_COMPTON.CSV
 # TODO : automatic RIMpro forecast folder creation  when it doesn't exist
 
 # imports
+from utils.utils import load_config
 import os
 import numpy as np
 import pandas as pd
-import configparser
-
-def load_config_file():
-    # Get the directory of the current script
-    script_dir = os.path.dirname(os.path.realpath(__file__))
-
-    # Join the script directory with the name of the configuration file
-    config_file_path = os.path.join(script_dir, 'ec_config.ini')
-
-    # Check if the configuration file exists
-    if not os.path.isfile(config_file_path):
-        raise FileNotFoundError(f"Configuration file does not exist: {config_file_path}")
-
-    config = configparser.ConfigParser()
-    config.read(config_file_path)
-    
-    return config
+import sys
 
 # load saved csv file of every forecast
 def load_saved_csv(id, path_input):
@@ -79,22 +64,29 @@ def write_df_to_RIMpro_csv(df, path_output, staname, ID):
 
 # %% Read station information and
 def process_forecasts(config):
-    
-    paths = config['Paths']
-    station_file = os.path.join(paths['ScriptPath'], 'vs_stations_test.dat')
-    station_info = pd.read_csv(station_file, skiprows=2)
+
+    path_to_rimpro = config['Paths']["SavedRIMproPath"]
+    path_to_save = config['Paths']["SavedEcForecastsPath"]
+    date_col = config['General']['DateColumn']
+
+    # Load station info
+    # InFile = os.path.join(path_to_script, 'VStations_p1.dat') uncomment for deployment
+    InFile = os.path.join(config['Paths']['TestPath'], 'vs_stations_test.dat')
+    try:
+        stations_info = pd.read_csv(InFile, skiprows=2)
+    except Exception as e:
+        sys.exit(1)
 
     # Loop over all stations found in the station file
-
-    for _, station in station_info.iterrows():
+    for _, station in stations_info.iterrows():
         # convert to RIMpro format
-        df = load_saved_csv(station['ID'], paths['SavedForecastsPath'])
+        df = load_saved_csv(station['ID'], path_to_save)
         df_ForRIMpro = (to_RIMpro_format(df).replace('nan', np.nan).fillna(-991))  # replace any missing nans with -991 (The rimpro equivalent for nans)
-        write_df_to_RIMpro_csv(df_ForRIMpro, paths['SavedRIMproPath'], station['Name'], station['ID'])
+        write_df_to_RIMpro_csv(df_ForRIMpro, path_to_rimpro, station['Name'], station['ID'])
 
 if __name__ == "__main__":
     # Define path to configuration file
-    config = load_config_file()
+    config = load_config('ec_config.json')
     # Define variables
     rain_col = "RAIN [mm]"
     rimpro_headers = ['DATE', 'TIME', 'AIRTEMP', 'AIRHUM', 'RAIN', 'GLOBALRAD']  # Note : DATE and TIME should not change    

@@ -49,57 +49,80 @@ posting_engine.putNewMessage(m)
 # when done, should close... cleaner...
 posting_engine.close()
 
-#%% Code that doesn't work
-def parse():
-    # Pull out the different attributes in the request object
-    url = request.json['url']
-    attribute = request.json['attribute']
-    queries = request.json['queries']
+#%% Trying out https://www.pathandfocus.com/blog/how-to-get-canadian-forecasting-data (but modified for python)
+import pika
+import json
 
-    # Copy the HRDPS file to a generated temporary file
-    with tempfile.NamedTemporaryFile() as tmpFile:
-        with urllib.request.urlopen(request.json['url']) as response:
-            shutil.copyfileobj(response, tmpFile)
-            tmpFile.flush()
+AMQP_URL = 'amqps://anonymous:anonymous@dd.weather.gc.ca/?heartbeat=60'
+EXCHANGE = 'xpublic'
+EXPIRES = 60000  # Set your expiration timeout in milliseconds
+QUEUE_NAME = 'YOUR_QUEUE_NAME'  # Replace with your queue name
+PYTHON_API = 'YOUR_PYTHON_API'  # Replace with your Python API endpoint or function
 
-        # Using Xarray and the cgfrib engine, open the HRDPS file and transform it to a 2D pandas dataframe
-        with xr.open_dataset(tmpFile.name, engine='cfgrib',
-                             backend_kwargs={'indexpath': ''}) as ds:
-            hrdps = ds.to_dataframe()
+def handle_grib2_file(url):
+    # Implement your logic to handle the GRIB2 file here.
+    print(f"Handling GRIB2 file from URL: {url}")
+    # You might want to call your PYTHON_API here or perform some action with the URL.
 
-        time = hrdps['time'].iloc[0]
-        step = hrdps['step'].iloc[0]
-        model_date = time.isoformat() + 'Z'
-        forecast_date = (time + step).isoformat() + 'Z'
+def start():
+    parameters = pika.URLParameters(AMQP_URL)
+    connection = pika.BlockingConnection(parameters)
+    channel = connection.channel()
 
-        # Query the dataset with a function that takes in the HRDPS data table, the lat & long, and the weather attribute specific to the file
-        results = query_hrdps(hrdps, queries, attribute)
+    # Declare the queue, if it doesn't exist, it will be created.
+    channel.queue_declare(queue=QUEUE_NAME, arguments={'x-expires': EXPIRES})
 
-    # Return a response object
-    return {
-        'url': url,
-        'forecastDate': forecast_date,
-        'modelDate': model_date,
-        'attribute': attribute,
-        'results': results
-    }
+    # Bind the queue to the exchange.
+    channel.queue_bind(queue=QUEUE_NAME, exchange=EXCHANGE, routing_key='v02.post.model_hrdps.continental.#TMP_AGL-2m#')
 
+    print(f'Subscribed to queue: {QUEUE_NAME}')
 
-import requests
+    def callback(ch, method, properties, body):
+        message_content = body.decode('utf-8')
+        time, host, pathname = message_content.split(' ')
+        url = f"http://{host}{pathname}"
 
-def download_data(api_url, headers=None, params=None):
-    response = requests.get(api_url, headers=headers, params=params)
+        handle_grib2_file(url)
+        ch.basic_ack(delivery_tag=method.delivery_tag)
 
-    if response.status_code == 200:
-        return response.json()  # or response.text if the data is not in json format
-    else:
-        print(f"Failed to download data. Status code: {response.status_code}")
-        return None
+    # Start consuming messages from the queue.
+    channel.basic_consume(queue=QUEUE_NAME, on_message_callback=callback, auto_ack=False)
 
-# Replace with your actual API URL, headers, and parameters
-api_url = "https://example.com/api"
-headers = {"Authorization": "Bearer YOUR_ACCESS_TOKEN"}
-params = {"param1": "value1", "param2": "value2"}
+    print('Waiting for messages. To exit press CTRL+C')
+    channel.start_consuming()
 
-data = download_data(api_url, headers, params)
+# if __name__ == '__main__':
+#     start()
 
+#%% Updated version with ChatGPT
+AMQP_URL = 'amqp://anonymous:anonymous@dd.weather.gc.ca'
+EXCHANGE = 'xpublic'
+QUEUE_NAME = 'q_anonymous.datamart_extract.IRDA'
+
+def connect_to_amqp():
+    parameters = pika.URLParameters(AMQP_URL)
+    connection = pika.BlockingConnection(parameters)
+    channel = connection.channel()
+
+    # Declare a queue
+    channel.queue_declare(queue=QUEUE_NAME, durable=True, arguments={'x-expires': 300000})  # Expiry time in ms
+
+    # Bind the queue to the exchange with your specific routing key
+    routing_key = 'v02.post.model_hrdps.continental.#TMP_AGL-2m#'
+    channel.queue_bind(exchange=EXCHANGE, queue=QUEUE_NAME, routing_key=routing_key)
+
+    return channel
+
+def callback(ch, method, properties, body):
+    # Process the message
+    message = json.loads(body)
+    print(f"Received: {message}")
+    # Implement your data processing or downloading logic here
+
+def start_consuming(channel):
+    channel.basic_consume(queue=QUEUE_NAME, on_message_callback=callback, auto_ack=True)
+    print(f"Subscribed to {QUEUE_NAME}. Waiting for messages.")
+    channel.start_consuming()
+
+channel = connect_to_amqp()
+start_consuming(channel)

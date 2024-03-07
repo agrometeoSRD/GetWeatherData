@@ -304,9 +304,13 @@ def combine_past_and_current_forecast(past_df: pd.DataFrame, current_df: pd.Data
     # update current_df with the corresponding past_rain value
     current_df.loc[current_df[date_col] == first_date, variables['rain_col']] = past_rain
 
+    # slice past_df so to only have times that after first hour of current_df
+    past_df = past_df[past_df[date_col] > first_date]
+
     combined_df = (current_df.combine_first(past_df)  # Combine dataframes, prioritizing current forecast
                    .sort_values(by=date_col)  # Sort by date in ascending order
                    .drop_duplicates(subset=date_col, keep='first')  # Remove duplicate rows
+                   .reset_index(drop=True)  # Reset the index
                    )
 
     return combined_df

@@ -1,10 +1,10 @@
 {
-  "temperature": ["Temp", "Tair", "TMoy"],
-  "precipitation": ["Precip", "Rainfall", "Prcp", "PR"],
+  "AIRTEMP [C]": ["Temp", "Tair", "TMoy"],
+  "RAIN [mm]": ["Precip", "Rainfall", "Prcp", "PR"],
   "wind_speed": ["WindSpd", "WS", "WindSpeed","Wind"],
     "wind_direction": ["WindDir", "WD", "WindDirection"],
   "max_temperature": ["Tmax", "MaxTemp"],
     "min_temperature": ["Tmin", "MinTemp"],
-    "humidity": ["Humidity", "Hum", "RH", "HR"],
-  "solar_radiation": ["SolarRad", "SR", "Solar","InSW"]
+    "HR [percent]": ["Humidity", "Hum", "RH", "HR"],
+  "GLOBALRAD [Wm2]": ["SolarRad", "SR", "Solar","InSW"]
 }

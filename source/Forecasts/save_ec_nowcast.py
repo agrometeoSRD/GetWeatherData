@@ -55,7 +55,7 @@ def load_forecast(path: str, filename: str, date_col:str) -> pd.DataFrame:
     # check if file exists. If it doesn't return as empty dataframe
     filename = f"{path}\\{filename}.csv"
     if not os.path.isfile(filename):
-        print('No file found, returning empty dataframe with columns DATE and TIME')
+        print('No saved forecast found, returning empty dataframe with columns DATE and TIME')
         return pd.DataFrame(columns=[date_col] + forecast_variables)
     else:
         df = pd.read_csv(filename,sep=None,engine='python',parse_dates=[date_col],dtype={
@@ -133,7 +133,7 @@ def fill_missing_hours(df, date_col):
 
 def save_forecast(forecast_df: pd.DataFrame, save_path: str, filename: str):
     out = f"{save_path}\\{filename}.csv"
-    print(f'Saving {filename} forecast to : {out}')
+    print(f'Saving forecast to : {out}')
     forecast_df.to_csv(out, index=False, sep=';',na_rep=np.nan)
 
 def main(config):

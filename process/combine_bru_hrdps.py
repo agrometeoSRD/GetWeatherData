@@ -74,3 +74,8 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# TODO : Create a function that will combine bru and hrdps for every available saved nowcast file
+# TODO : Check what happens if file exists for nowcast (like RIMpro nowcast) but doesnt exist in .BRU
+# TODO : Check what happens if file exists for .BRU but doesnt exist for nowcast
+# TODO : Check what happens if file exists for neither nowcast nor .BRU

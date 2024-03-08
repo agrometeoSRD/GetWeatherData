@@ -31,7 +31,7 @@ Notes:
     2022-02-24 23:00:00 -12.291052 65.531517 0.0 50
 
     - Example with the CLI (directory must be at the root of the project) :
-    python -m source.Forecasts.ec_forecast.py --dat-file THEPATH/test/vs_stations_test.dat
+    python -m source.Forecasts.ec_forecast --dat-file THEPATH/test/vs_stations_test.dat
 
 """
 # TODO : Create automatic file to get acces to station data. Add the necessary errors to make sure the data is there

@@ -41,7 +41,7 @@ def load_saved_csv(id, path_input):
 # Convert to RIMPro format
 def to_RIMpro_format(df):
     '''
-    Following columns must be present : all Forecast_VariableS_List and 'Date' column
+    Following columns must be present : all Forecast_Variables_List and 'Date' column
     '''
     df_ForRIMpro = (df[forecast_variables + ['Date']]
                     .assign(
@@ -80,9 +80,8 @@ def process_forecasts(config):
     InFile = os.path.join(config['Paths']['TestPath'], 'vs_stations_test.dat')
     try:
         stations_info = pd.read_csv(InFile, skiprows=2)
-    except Exception as e:
+    except Exception:
         sys.exit(1)
-
 
     for _, station in stations_info.iterrows():
         # convert to RIMpro format

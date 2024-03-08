@@ -38,18 +38,21 @@ def load_saved_csv(id, path_input):
 # Convert to RIMPro format
 def to_RIMpro_format(df):
     '''
-    Following columns must be present : all Forecast_VariableS_List and 'Date' column
+    Following columns must be present : all Forecast_Variables_List and 'Date' column
     '''
     df_ForRIMpro = (df[forecast_variables + ['Date']]
                     .assign(
         **df['Date'].astype(str).str.rsplit(' ', n=1, expand=True).rename(columns={0: 'DATE', 1: 'TIME'}))
                     .loc[:, ['DATE', 'TIME'] + forecast_variables]
+                    .apply(lambda x: x.round(3) if x.name in forecast_variables else x)
                     .rename(columns=dict(zip(['DATE', 'TIME'] + forecast_variables, rimpro_headers)))
-                    .astype(str))
-    df_ForRIMpro['DATE'] = df_ForRIMpro['DATE'].str.replace("-","/") # dont know why I wasnt able to chain this function
+                    .astype(str)
+                    .assign(TIME = lambda x: x['TIME'].str[:-3])
+                    )
+    # add -991 to the LW1 column
+    df_ForRIMpro['LW1'] = '-991'
 
     return df_ForRIMpro
-
 
 # Save as csv
 def write_df_to_RIMpro_csv(df, path_output, staname, ID):

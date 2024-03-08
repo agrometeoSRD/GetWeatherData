@@ -126,3 +126,4 @@ def start_consuming(channel):
 
 channel = connect_to_amqp()
 start_consuming(channel)
+

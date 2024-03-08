@@ -20,13 +20,14 @@ DATE	TIME	AIRTEMP	AIRHUM	RAIN	LW1
 2022-02-25	01:00:00	-12.102331	58.036999	0.0	-991
 
 - To use with the CLI. Must be in same directory as the python script. Here's an example.
-python to_rimpro.py --source ec_forecasts --suffix '_saved_forecast.csv'
+python to_rimpro.py --source ec_forecasts --suffix _saved_forecast.csv
 """
 
 # Import statements
 import argparse
 import sys
 import os
+import glob
 import numpy as np
 import pandas as pd
 from utils.utils import load_config
@@ -80,18 +81,30 @@ def process_forecasts(config:dict, file_suffix:str, source:str):
     forecast_variables = [variables['temp_col'], variables['hr_col'], variables['rain_col'], variables['rad_col']]
     rimpro_headers = ['DATE', 'TIME', 'AIRTEMP', 'AIRHUM', 'RAIN', 'GLOBALRAD']  # Note : DATE and TIME should not change
 
-    InFile = os.path.join(config['Paths']['TestPath'], 'vs_stations_test.dat')
-    try:
-        stations_info = pd.read_csv(InFile, skiprows=2)
-    except Exception as e:
-        print(f"Failed to load station info: {e}")
-        sys.exit(1)
+    # InFile = os.path.join(config['Paths']['TestPath'], 'vs_stations_test.dat')
+    # try:
+    #     stations_info = pd.read_csv(InFile, skiprows=2)
+    # except Exception as e:
+    #     print(f"Failed to load station info: {e}")
+    #     sys.exit(1)
+    #
+    # for _, station in stations_info.iterrows():
+    #     df = load_saved_csv(station['ID'], source_path, file_suffix)
+    #     df_ForRIMpro = to_RIMpro_format(df, forecast_variables, rimpro_headers).replace('nan', np.nan).fillna(-991)
+    #     write_df_to_RIMpro_csv(df_ForRIMpro, path_to_rimpro, station['Name'], station['ID'], file_suffix)
 
-    for _, station in stations_info.iterrows():
-        df = load_saved_csv(station['ID'], source_path, file_suffix)
-        df_ForRIMpro = to_RIMpro_format(df, forecast_variables, rimpro_headers).replace('nan', np.nan).fillna(-991)
-        write_df_to_RIMpro_csv(df_ForRIMpro, path_to_rimpro, station['Name'], station['ID'], file_suffix)
+    csv_files = glob.glob(os.path.join(source_path, '*.csv'))
+    # Process each CSV file
+    for csv_file in csv_files:
+        try:
+            station_id = os.path.basename(csv_file).split('_')[0]
 
+            df = load_saved_csv(station_id, source_path, file_suffix)
+            df_ForRIMpro = to_RIMpro_format(df, forecast_variables, rimpro_headers).replace('nan', np.nan).fillna(-991)
+            write_df_to_RIMpro_csv(df_ForRIMpro, path_to_rimpro, station_id, station_id, file_suffix)
+        except Exception as e:
+            print(f"Error processing station {csv_file}: {e}")
+            sys.exit(1)
 
 # Main execution ---------------------------------------
 if __name__ == "__main__":

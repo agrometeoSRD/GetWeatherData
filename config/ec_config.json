@@ -1,9 +1,9 @@
 {
   "Paths": {
     "ScriptPath": "./source/Forecasts",
-    "SavedEcForecastsPath": "./source/Forecasts/saved_forecasts",
-    "SavedEcVsForecastsPath": "./source/Forecasts/saved_vs_forecasts",
-    "SavedRIMproPath": "./source/Forecasts/rimpro_format",
+    "SavedEcForecastsPath": "./data/saved_forecasts",
+    "SavedEcVsForecastsPath": "./data/saved_vs_forecasts",
+    "SavedRIMproPath": "./data/rimpro_format",
     "TestPath": "./test"
   },
   "General": {

@@ -13,7 +13,7 @@ NOTE : THIS WAS A TEST FILE TO UNDERSTAND HOW TO WRITE TESTS IN PYTHON. NOT ACTU
 
 # Import statements
 import unittest
-from source.Forecasts.ECCC_Forecasts import combine_past_and_current_forecast
+from source.Forecasts.ec_forecasts import combine_past_and_current_forecast
 import pandas as pd
 from pandas.testing import assert_frame_equal
 

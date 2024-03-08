@@ -9,11 +9,13 @@ Description:
 - Use the MSC API (oswlib) to get data from the geomet server.
 - Input requires a spatial coordinate (From a station file) and output will save forecast for this coordinate within a csv file.
 
-Updates:
+Updates: (see commits)
 
 Notes:
     - Unlike all past iterations of getting forecast, now the forecast script doesn't transform the data into RIMpro format
+
     - This only works for eastern time zones
+
     - Precipitaiton (PR TO RAIN) :
         - Raw precipitation is in kg/m2, but assuming density of water to be 1kg/L, this gives us a 1:1 translation into mm
         - Raw precipitaiton is also cumulative. Subtract by previous hour to get hourly precipitaiton
@@ -28,10 +30,12 @@ Notes:
     DATE AIRTEMP HR RAIN GLOBALRAD
     2022-02-24 23:00:00 -12.291052 65.531517 0.0 50
 
+    - Example with the CLI (directory must be at the root of the project) :
+    python -m source.Forecasts.ec_forecast.py --dat-file THEPATH/test/vs_stations_test.dat
+
 """
 # TODO : Create automatic file to get acces to station data. Add the necessary errors to make sure the data is there
 # TODO : Test fonctions for anomalous data
-# TODO : Test forecast with multiple stations
 # TODO : Find some way to incorporate a percentage progress bar
 
 # imports
@@ -40,6 +44,7 @@ import sys
 import os
 import re
 import warnings
+import argparse
 from datetime import datetime, timedelta
 from functools import reduce
 import time
@@ -53,13 +58,12 @@ from owslib.wms import WebMapService
 warnings.filterwarnings("ignore")
 
 # constants
-# Function to request weather data for a given layer, time, and coordinates
+# Request information for weather data for a given layer, time, and coordinates
 wms_url = 'https://geo.weather.gc.ca/geomet/?SERVICE=WMS&REQUEST=GetFeatureInfo'
 wms = WebMapService(wms_url, version='1.3.0', timeout=300)
 common_var_names = ['TT', 'HR', 'PR', 'N4']  # These are the common variable names between the different forecast models
 
 # Functions
-
 def request(layer: str, times: list, coor: list) -> list:
     pixel_values = []
     for timestep in times:
@@ -181,22 +185,6 @@ def process_request(station_info: pd.DataFrame, date_col: str) -> dict:
     gdps_df = run_gdps(coor, timesteps_dict, date_col)
 
     return {'RDPS': rdps_df, 'GDPS': gdps_df, 'HRDPS': hrdps_df}
-
-
-def fill_missing_hours(df: pd.DataFrame, date_col: str) -> pd.DataFrame:
-    min_date = df[date_col].min()
-    max_date = df[date_col].max()
-
-    # Create a DatetimeIndex for every hour between min_date and max_date
-    full_index = pd.date_range(min_date, max_date, freq='H')
-
-    # Set the date column as the index of the dataframe
-    df = (df.set_index(date_col).reindex(
-        full_index)  # Reindex the dataframe using the full index, which fills in missing hours with NaNs
-          .reset_index()  # Reset the index so the date column is a regular column again
-          .rename(columns={'index': date_col}))
-    return df
-
 
 def concatenate_forecasts(forecast_dict: dict, date_col: str) -> pd.DataFrame:
     """
@@ -332,23 +320,24 @@ def save_forecast(forecast_df: pd.DataFrame, save_path: str, filename: str):
 
 
 # %% Read station information and process each station
+def parse_args():
+    parser = argparse.ArgumentParser(description='Process weather forecast data.')
+    parser.add_argument('--dat-file', required=True, help='Path to the .dat file with station information')
+    return parser.parse_args()
 
-def main(config):
+def main(config,dat_file):
     start_time = time.time()
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     logger = logging.getLogger(__name__)
 
-    path_to_script = config['Paths']['ScriptPath']
     path_to_save = config['Paths']["SavedEcForecastsPath"]
     date_col = config['General']['DateColumn']
 
     # Load station info
-    # InFile = os.path.join(path_to_script, 'VStations_p1.dat') uncomment for deployment
-    InFile = os.path.join(config['Paths']['TestPath'], 'vs_stations_test.dat')
     try:
-        Stations_info = pd.read_csv(InFile, skiprows=2)
+        Stations_info = pd.read_csv(dat_file, skiprows=2)
     except Exception as e:
-        logger.error(f"Error reading file {InFile}: {e}")
+        logger.error(f"Error reading file {dat_file}: {e}")
         sys.exit(1)
 
     # Additional processing
@@ -372,9 +361,9 @@ def main(config):
 
     logger.info(f"Script completed in {time.time() - start_time} seconds")
 
-
 if __name__ == "__main__":
+    args = parse_args()  # Parse command-line arguments
     config = load_config('ec_config.json')
     variables = config['General']
     forecast_variables = [variables['temp_col'], variables['hr_col'], variables['rain_col'], variables['rad_col']]
-    main(config)
+    main(config, args.dat_file)  # Pass the dat_file path to main

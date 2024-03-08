@@ -5,6 +5,7 @@ Creator : the_l
 Python version : 3.10
 
 Description:
+NOTE : OUTDATE. SEE TO_RIMPRO.PY
 - This is a direct copy of forecast_to_rimpro.py
 - 2024-02-21 : as of now, the only difference is the different paths
 

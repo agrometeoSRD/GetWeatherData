@@ -5,6 +5,7 @@ Creator : the_l
 Python version : 3.10
 
 Description:
+NOTE : OUTDATE. SEE TO_RIMPRO.PY
 
 Notes:
     - Will probably not stay within this subfolder

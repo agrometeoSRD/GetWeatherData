@@ -13,12 +13,12 @@ Created: 2024-02-20
 """
 
 # Import statements
-import sys
 import os
 import logging
 import time
 import numpy as np
 import pandas as pd
+import glob
 
 from utils.utils import load_config
 
@@ -133,42 +133,41 @@ def fill_missing_hours(df, date_col):
 
 def save_forecast(forecast_df: pd.DataFrame, save_path: str, filename: str):
     out = f"{save_path}\\{filename}.csv"
-    print(f'Saving forecast to : {out}')
+    print(f'Saving {filename} forecast to : {out}')
     forecast_df.to_csv(out, index=False, sep=';',na_rep=np.nan)
 
 def main(config):
-    start_time = time.time()
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     logger = logging.getLogger(__name__)
 
-
-    path_to_script = config['Paths']['ScriptPath']
-    path_to_current = config['Paths']["SavedEcForecastsPath"]
     path_to_vs = config['Paths']["SavedEcVsForecastsPath"]
     date_col = config['General']['DateColumn']
 
-    # Load station info
-    # InFile = os.path.join(path_to_script, 'VStations_p1.dat') uncomment for deployment
-    InFile = os.path.join(config['Paths']['TestPath'], 'vs_stations_test.dat')
-    try:
-        Stations_info = pd.read_csv(InFile, skiprows=2)
-    except Exception as e:
-        logger.error(f"Error reading file {InFile}: {e}")
-        sys.exit(1)
-
-    # Process each station
-    for _, row in Stations_info.iterrows():
-        # Log progress
-        logger.info(f"Processing station {row['ID']}")
+    path_to_forecast = config['Paths']["SavedEcForecastsPath"]
+    # Use glob to find all CSV files in the directory
+    csv_files = glob.glob(os.path.join(path_to_forecast, '*.csv'))
+    # Process each CSV file
+    for csv_file in csv_files:
         try:
-            current_forecast = load_most_recent_forecast(path_to_current,f'{row["ID"]}_saved_forecast',date_col)
-            vs_forecast = load_vs_forecast(path_to_vs,f'{row["ID"]}_vs',date_col)
-            combined_forecast = combine_past_and_current_forecast(vs_forecast,current_forecast,date_col)
-            combined_forecast = fill_missing_hours(combined_forecast,date_col)
-            save_forecast(combined_forecast,path_to_vs,f'{row["ID"]}_vs')
-        except Exception as e:
-            logger.error(f"Error processing station {row['ID']}: {e}")
+            # Extract station ID from the file name, assuming it's formatted as '{ID}_saved_forecast.csv'
+            # This step may need adjustment based on your actual file naming conventions
+            station_id = os.path.basename(csv_file).split('_')[0]
 
+            logger.info(f"Processing station {station_id}")
+
+            # Load the current and vs forecasts using the derived station ID
+            current_forecast = load_most_recent_forecast(path_to_forecast, f'{station_id}_saved_forecast', date_col)
+            vs_forecast = load_vs_forecast(path_to_vs, f'{station_id}_vs', date_col)
+
+            # Combine forecasts and process them
+            combined_forecast = combine_past_and_current_forecast(vs_forecast, current_forecast, date_col)
+            combined_forecast = fill_missing_hours(combined_forecast, date_col)
+
+            # Save the combined forecast
+            save_forecast(combined_forecast, path_to_vs, f'{station_id}_vs')
+
+        except Exception as e:
+            logger.error(f"Error processing station {csv_file}: {e}")
 
 # Main execution --------------------------------------
 

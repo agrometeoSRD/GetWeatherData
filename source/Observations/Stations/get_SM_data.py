@@ -19,7 +19,6 @@ Created: 2024-02-21
 """
 
 # Import statements
-import sys
 import argparse
 import urllib
 import json
@@ -30,6 +29,8 @@ import datetime
 from typing import Dict,Union, Type, List, Any
 import numpy as np
 import pandas as pd
+import pytz
+from pandas.tseries.frequencies import to_offset
 
 # Constants
 # Configure basic logging
@@ -60,16 +61,49 @@ def set_column_types(config):
     column_types.update({col: str for col in config["BRU_date_headers"]})
     return column_types
 
+import pandas as pd
+import pytz
+from pandas.tseries.frequencies import to_offset
+
+def convert_to_eastern(df, datetime_col='Date'):
+    """
+    Converts the datetime column of a pandas DataFrame from Eastern Time to
+    Eastern Daylight Time or Eastern Standard Time as appropriate,
+    considering daylight saving adjustments.
+
+    Parameters:
+    df (pandas.DataFrame): The dataframe containing the datetime column.
+    datetime_col (str): The name of the datetime column in the dataframe.
+
+    Returns:
+    pandas.DataFrame: A new dataframe with the converted datetime column.
+    """
+
+    df[datetime_col] = pd.to_datetime(df[datetime_col])
+
+    # Localize the timezone to EST (ignoring DST)
+    df[datetime_col] = df[datetime_col].dt.tz_localize('EST', ambiguous='infer')
+
+    # Convert to Eastern Time (automatically handles DST)
+    df[datetime_col] = df[datetime_col].dt.tz_convert('America/New_York')
+
+    # Remove timezone information
+    df[datetime_col] = df[datetime_col].dt.tz_localize(None)
+
+    return df
+
 def convert_time(df:pd.DataFrame) -> pd.DataFrame:
     df['Hour'] = df['Hour'].astype(str).str.zfill(4) # pad with 0s
-    df = (df.assign(Datetime = df['Year'].astype(str) +'-'+ df['Day'].astype(str) +'-'+ df['Hour'])
-            .assign(Datetime = lambda df: pd.to_datetime(df['Datetime'], format='%Y-%j-%H%M'))
+    df = (df.assign(Date =df['Year'].astype(str) + '-' + df['Day'].astype(str) + '-' + df['Hour'])
+            .assign(Date = lambda df: pd.to_datetime(df['Date'], format='%Y-%j-%H%M'))
             .drop(columns=['Year', 'Day', 'Hour'])
           )
     # palce datetime as first column
     cols = df.columns.tolist()
     cols = cols[-1:] + cols[:-1]
     df = df[cols]
+    # convert normal time to local (normal / eastern)
+    df = convert_to_eastern(df, 'Date')
     return df
 
 def define_station_names(station_names: list[str]) -> list[str]:

@@ -11,6 +11,9 @@ Description: Some .BRU dont have solar radiation. Use HRDPS solar radiation nowc
 
 - Output columns will be standardized to the universal column names (for those that have a universal name)
 
+Notes
+- There must be available nowcast files within the saved virtual station folder. To create these, see ec_forecasts.py and save_ec_nowcast.py
+
 Created: 2024-02-27
 """
 
@@ -18,6 +21,7 @@ Created: 2024-02-27
 import os
 import pandas as pd
 import numpy as np
+import datetime
 from source.Observations.Stations.get_SM_data import download_and_process_data
 from utils.utils import load_config
 from utils.utils import invert_mapping
@@ -57,25 +61,32 @@ def save_dataframe_to_csv(forecast_df: pd.DataFrame, save_path: str, filename: s
 
 
 # Main execution ---------------------------------------
-name_id_dict = {'Compton': 'COMPTN', 'Dunham': 'DUNHM'}
 
 def main():
     # Load the configuration file
     config = load_config('ec_config.json') # load config file that contains paths to folders
     save_path = config['Paths']["SavedEcVsForecastsPath"] # define as a variable the path to the data
-    # set up parameters
-    sel_station = ['Compton']
-    sel_years = ['2024']
 
-    nowcast_df = load_saved_nowcast_csv(name_id_dict[sel_station[0]], save_path)
-    bru_df = standardize_columns(download_and_process_data(sel_station, sel_years))
-    combined_df = concatenate_bru_nowcast(bru_df, nowcast_df)
-    save_dataframe_to_csv(combined_df, save_path, f"{name_id_dict[sel_station[0]]}_bru_nowcast")
+    # set up parameters
+    sel_year = datetime.datetime.now().strftime("%Y") # get current year (in string)
+    # Load station info
+    dat_file = "C:\\Users\\sebastien.durocher\\PycharmProjects\\GetWeatherData\\source\\Forecasts\\VStations.dat"
+    stations_info = pd.read_csv(dat_file, skiprows=2)
+
+    for i, _ in stations_info.iterrows():
+        sel_station_name = stations_info.loc[i,'Name']
+        sel_station_id = stations_info.loc[i,'ID']
+
+        nowcast_df = load_saved_nowcast_csv(sel_station_id, save_path) # get the nowcast
+        bru_df = standardize_columns(download_and_process_data([sel_station_name], [sel_year])) # get the bru data
+        combined_df = concatenate_bru_nowcast(bru_df, nowcast_df) # merge together
+        save_dataframe_to_csv(combined_df, save_path, f"{sel_station_id}_bru_nowcast") # save as csv
 
 if __name__ == "__main__":
     main()
 
-# TODO : Create a function that will combine bru and hrdps for every available saved nowcast file
 # TODO : Check what happens if file exists for nowcast (like RIMpro nowcast) but doesnt exist in .BRU
 # TODO : Check what happens if file exists for .BRU but doesnt exist for nowcast
 # TODO : Check what happens if file exists for neither nowcast nor .BRU
+# TODO : Remove absolute path and replace with something more universal / flexible
+

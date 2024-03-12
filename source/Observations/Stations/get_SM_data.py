@@ -166,6 +166,9 @@ def process_data(df:pd.DataFrame) -> pd.DataFrame:
     # convert -991 to nan
     df = df.replace(-991, np.nan)  # Convert -991 to nan
 
+    # convert solar radiation kj/h*m2 into W/m2
+    df['InSW'] = (df['InSW'] * 1000 / 3600).round(3)
+
     return df
 
 def download_and_process_data(station_names: List[str], years: List[str], config: Dict = None):

@@ -322,7 +322,7 @@ def save_forecast(forecast_df: pd.DataFrame, save_path: str, filename: str):
 # %% Read station information and process each station
 def parse_args():
     parser = argparse.ArgumentParser(description='Process weather forecast data.')
-    parser.add_argument('--dat-file', required=True, help='Path to the .dat file with station information')
+    parser.add_argument('--dat-file', default=r"C:\Users\sebastien.durocher\PycharmProjects\GetWeatherData\test\VStations_p2.dat", help='Path to the .dat file with station information')
     return parser.parse_args()
 
 def main(config,dat_file):
@@ -351,11 +351,11 @@ def main(config,dat_file):
         try:
             forecast = process_request(row, date_col)
             forecast_dataframe = concatenate_forecasts(forecast, date_col)
-            past_forecast = load_forecast(path_to_save, f'{row["ID"]}_saved_forecast', date_col)
+            past_forecast = load_forecast(path_to_save, f'{row["ID"]}{config["Filename_extension"]["EcForecast"]}', date_col)
             final_forecast = combine_past_and_current_forecast(past_forecast, forecast_dataframe, date_col)
             final_forecast = fill_missing_hours(final_forecast, date_col)
             final_forecast[forecast_variables] = final_forecast[forecast_variables].round(3)
-            save_forecast(final_forecast, path_to_save, f'{row["ID"]}_saved_forecast')
+            save_forecast(final_forecast, path_to_save, f'{row["ID"]}{config["Filename_extension"]["EcForecast"]}')
         except Exception as e:
             logger.error(f"Error processing station {row['ID']}: {e}")
 

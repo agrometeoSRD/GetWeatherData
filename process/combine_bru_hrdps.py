@@ -36,13 +36,13 @@ def standardize_columns(df: pd.DataFrame) -> pd.DataFrame:
     return df.rename(columns=standardize_columns_dict)
 
 # Load the .BRU files for selected stations
-def load_saved_nowcast_csv(id, path_input):
-    InFile = os.path.join(path_input, f"{id}_vs.csv") #id not the same as station name
+def load_saved_nowcast_csv(InFile : str) -> pd.DataFrame:
     if os.path.isfile(InFile):
         df = pd.read_csv(InFile, sep=';')
         df = standardize_columns(df)
         return df
     else: # return empty pandas dataframe
+        print('No nowcast data not found. Returning empty data')
         return pd.DataFrame()
 
 # Combine the .BRU and nowcast data
@@ -66,18 +66,18 @@ def main():
     # Load the configuration file
     config = load_config('ec_config.json') # load config file that contains paths to folders
     save_path = config['Paths']["SavedEcVsForecastsPath"] # define as a variable the path to the data
-
+    station_path = config['Paths']["CoordinatesFilePath"]
     # set up parameters
     sel_year = datetime.datetime.now().strftime("%Y") # get current year (in string)
     # Load station info
-    dat_file = "C:\\Users\\sebastien.durocher\\PycharmProjects\\GetWeatherData\\source\\Forecasts\\VStations.dat"
+    dat_file = f"{station_path}\\VStations.dat"
     stations_info = pd.read_csv(dat_file, skiprows=2)
 
     for i, _ in stations_info.iterrows():
         sel_station_name = stations_info.loc[i,'Name']
         sel_station_id = stations_info.loc[i,'ID']
 
-        nowcast_df = load_saved_nowcast_csv(sel_station_id, save_path) # get the nowcast
+        nowcast_df = load_saved_nowcast_csv(f'{save_path}\\{sel_station_id}{config["Filename_extension"]["EcVs"]}.csv') # get the nowcast
         bru_df = standardize_columns(download_and_process_data([sel_station_name], [sel_year])) # get the bru data
         combined_df = concatenate_bru_nowcast(bru_df, nowcast_df) # merge together
         save_dataframe_to_csv(combined_df, save_path, f"{sel_station_id}_bru_nowcast") # save as csv
@@ -89,4 +89,5 @@ if __name__ == "__main__":
 # TODO : Check what happens if file exists for .BRU but doesnt exist for nowcast
 # TODO : Check what happens if file exists for neither nowcast nor .BRU
 # TODO : Remove absolute path and replace with something more universal / flexible
-
+# TODO : Create a new script that does the same thing but for non .BRU files (like WU)
+# TODO : Add some kind of smoothing when adding nowcast to .BRU

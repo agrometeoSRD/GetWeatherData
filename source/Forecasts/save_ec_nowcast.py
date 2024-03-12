@@ -55,7 +55,7 @@ def load_forecast(path: str, filename: str, date_col:str) -> pd.DataFrame:
     # check if file exists. If it doesn't return as empty dataframe
     filename = f"{path}\\{filename}.csv"
     if not os.path.isfile(filename):
-        print('No saved forecast found, returning empty dataframe with columns DATE and TIME')
+        print('No saved forecast found. Creating new virtual station with only current 0-6 hours forecast')
         return pd.DataFrame(columns=[date_col] + forecast_variables)
     else:
         df = pd.read_csv(filename,sep=None,engine='python',parse_dates=[date_col],dtype={
@@ -141,9 +141,9 @@ def main(config):
     logger = logging.getLogger(__name__)
 
     path_to_vs = config['Paths']["SavedEcVsForecastsPath"]
+    path_to_forecast = config['Paths']["SavedEcForecastsPath"]
     date_col = config['General']['DateColumn']
 
-    path_to_forecast = config['Paths']["SavedEcForecastsPath"]
     # Use glob to find all CSV files in the directory
     csv_files = glob.glob(os.path.join(path_to_forecast, '*.csv'))
     # Process each CSV file
@@ -156,15 +156,15 @@ def main(config):
             logger.info(f"Processing station {station_id}")
 
             # Load the current and vs forecasts using the derived station ID
-            current_forecast = load_most_recent_forecast(path_to_forecast, f'{station_id}_saved_forecast', date_col)
-            vs_forecast = load_vs_forecast(path_to_vs, f'{station_id}_vs', date_col)
+            current_forecast = load_most_recent_forecast(path_to_forecast, f'{station_id}{config["Filename_extension"]["EcForecast"]}', date_col)
+            vs_forecast = load_vs_forecast(path_to_vs, f'{station_id}{config["Filename_extension"]["EcVs"]}', date_col)
 
             # Combine forecasts and process them
             combined_forecast = combine_past_and_current_forecast(vs_forecast, current_forecast, date_col)
             combined_forecast = fill_missing_hours(combined_forecast, date_col)
 
             # Save the combined forecast
-            save_forecast(combined_forecast, path_to_vs, f'{station_id}_vs')
+            save_forecast(combined_forecast, path_to_vs, f'{station_id}{config["Filename_extension"]["EcVs"]}')
 
         except Exception as e:
             logger.error(f"Error processing station {csv_file}: {e}")

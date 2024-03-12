@@ -81,18 +81,6 @@ def process_forecasts(config:dict, file_suffix:str, source:str):
     forecast_variables = [variables['temp_col'], variables['hr_col'], variables['rain_col'], variables['rad_col']]
     rimpro_headers = ['DATE', 'TIME', 'AIRTEMP', 'AIRHUM', 'RAIN', 'GLOBALRAD']  # Note : DATE and TIME should not change
 
-    # InFile = os.path.join(config['Paths']['TestPath'], 'vs_stations_test.dat')
-    # try:
-    #     stations_info = pd.read_csv(InFile, skiprows=2)
-    # except Exception as e:
-    #     print(f"Failed to load station info: {e}")
-    #     sys.exit(1)
-    #
-    # for _, station in stations_info.iterrows():
-    #     df = load_saved_csv(station['ID'], source_path, file_suffix)
-    #     df_ForRIMpro = to_RIMpro_format(df, forecast_variables, rimpro_headers).replace('nan', np.nan).fillna(-991)
-    #     write_df_to_RIMpro_csv(df_ForRIMpro, path_to_rimpro, station['Name'], station['ID'], file_suffix)
-
     csv_files = glob.glob(os.path.join(source_path, '*.csv'))
     # Process each CSV file
     for csv_file in csv_files:
@@ -110,9 +98,12 @@ def process_forecasts(config:dict, file_suffix:str, source:str):
 if __name__ == "__main__":
     # path examples :` config['Paths']["SavedEcForecastsPath"] or config['Paths']["SavedEcVsForecastsPath"]
     parser = argparse.ArgumentParser(description="Process forecasts and convert to RIMPro format.")
-    parser.add_argument("--source", help="Define file location (ec_forecasts, ec_vs_forecasts, bru_nowcast",default='ec_forecasts')
-    parser.add_argument("--suffix", help="File suffix to load the correct csv (must add .csv)",default='_saved_forecast.csv')
+    parser.add_argument("--source", help="Define file location (ec_forecasts, ec_vs_forecasts, bru_nowcast). File location must exist",default='ec_forecasts')
+    parser.add_argument("--suffix", help="File suffix to load the correct csv (must add .csv). File must exist before being converted to RIMpro.",default='_ec_forecast.csv')
     args = parser.parse_args()
 
     config = load_config('ec_config.json')
     process_forecasts(config, args.suffix, args.source)
+
+# TODO : Add condition if folder location doesn't exist
+# TODO : Add condition if file doesn't exist

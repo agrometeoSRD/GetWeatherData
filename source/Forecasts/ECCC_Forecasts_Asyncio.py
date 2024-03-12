@@ -180,7 +180,7 @@ async def main(config_path):
     config = configparser.ConfigParser()
     config.read(config_path)
 
-    path_to_script = config.get('Paths', 'ScriptPath')
+    path_to_script = config.get('Paths', 'EcScriptPath')
     path_to_save = config.get('Paths', 'SavePath')
     date_col = config.get('General', 'DateColumn')
 

@@ -237,7 +237,7 @@ def load_forecast(past_path: str, filename: str, date_col: str) -> pd.DataFrame:
     # check if file exists. If it doesn't return as empty dataframe
     filename = f"{past_path}\\{filename}.csv"
     if not os.path.isfile(filename):
-        print('No file found, returning empty dataframe with columns DATE and TIME')
+        print('No past forecast file found. Saved forecast will only be for current forecast')
         return pd.DataFrame(columns=[date_col] + forecast_variables)
     else:
         df = pd.read_csv(filename, sep=None, engine='python', parse_dates=[date_col],

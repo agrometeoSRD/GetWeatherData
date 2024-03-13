@@ -34,13 +34,12 @@ from pandas.tseries.frequencies import to_offset
 
 # Constants
 # Configure basic logging
-logging.basicConfig(level=logging.INFO,format='%asctime)s - %(levelname)s - %(message)s',datefmt='%Y-%m-%d %H:%M:%S')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 # Functions
 def load_config(config_path=None):
     try:
-        logging.info("Configuration loaded successfully")
         if config_path is None:
             # Access the default configuration as a package resource
             with resources.open_text('source.Observations.Stations', 'config.json') as f:

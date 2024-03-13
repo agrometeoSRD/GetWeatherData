@@ -42,8 +42,8 @@ def load_saved_nowcast_csv(InFile : str) -> pd.DataFrame:
         df = standardize_columns(df)
         return df
     else: # return empty pandas dataframe
-        print('No nowcast data not found. Returning empty data')
-        return pd.DataFrame()
+        print('No nowcast data not found.')
+        return pd.DataFrame(columns=['Date'])
 
 # Combine the .BRU and nowcast data
 def concatenate_bru_nowcast(bru_df, nowcast_df):
@@ -74,13 +74,20 @@ def main():
     stations_info = pd.read_csv(dat_file, skiprows=2)
 
     for i, _ in stations_info.iterrows():
-        sel_station_name = stations_info.loc[i,'Name']
-        sel_station_id = stations_info.loc[i,'ID']
+        try :
+            sel_station_name = stations_info.loc[i,'Name']
+            sel_station_id = stations_info.loc[i,'ID']
+            bru_df = standardize_columns(download_and_process_data([sel_station_name], [sel_year])) # get the bru data
 
-        nowcast_df = load_saved_nowcast_csv(f'{save_path}\\{sel_station_id}{config["Filename_extension"]["EcVs"]}.csv') # get the nowcast
-        bru_df = standardize_columns(download_and_process_data([sel_station_name], [sel_year])) # get the bru data
-        combined_df = concatenate_bru_nowcast(bru_df, nowcast_df) # merge together
-        save_dataframe_to_csv(combined_df, save_path, f"{sel_station_id}_bru_nowcast") # save as csv
+            if not bru_df.empty: # Only continue if .bru exists
+                nowcast_df = load_saved_nowcast_csv(f'{save_path}\\{sel_station_id}{config["Filename_extension"]["EcVs"]}.csv') # get the nowcast
+                combined_df = concatenate_bru_nowcast(bru_df, nowcast_df) # merge together
+                save_dataframe_to_csv(combined_df, save_path, f"{sel_station_id}_bru_nowcast") # save as csv
+            else:
+                print('No .bru data found this file. Skipping to next station.')
+        except :
+            print('Some problem occured at the given station. Creation of bru+nowcast was unsuccessful.')
+            pass
 
 if __name__ == "__main__":
     main()

@@ -36,7 +36,7 @@ from utils.utils import load_config
 
 # Functions
 def load_saved_csv(id, path_input, file_suffix):
-    InFile = os.path.join(path_input, f"{id}{file_suffix}")
+    InFile = os.path.join(path_input, f"{id}{file_suffix}.csv")
     # Read file as pandas, but throw error if file does not exist (print file name to check if properly written)
     try:
         df = pd.read_csv(InFile, sep=';')
@@ -81,7 +81,7 @@ def process_forecasts(config:dict, file_suffix:str, source:str):
     forecast_variables = [variables['temp_col'], variables['hr_col'], variables['rain_col'], variables['rad_col']]
     rimpro_headers = ['DATE', 'TIME', 'AIRTEMP', 'AIRHUM', 'RAIN', 'GLOBALRAD']  # Note : DATE and TIME should not change
 
-    csv_files = glob.glob(os.path.join(source_path, '*.csv'))
+    csv_files = glob.glob(os.path.join(source_path, f'*{file_suffix}.csv'))
     # Process each CSV file
     for csv_file in csv_files:
         try:
@@ -92,14 +92,13 @@ def process_forecasts(config:dict, file_suffix:str, source:str):
             write_df_to_RIMpro_csv(df_ForRIMpro, path_to_rimpro, station_id, station_id, file_suffix)
         except Exception as e:
             print(f"Error processing station {csv_file}: {e}")
-            sys.exit(1)
 
 # Main execution ---------------------------------------
 if __name__ == "__main__":
     # path examples :` config['Paths']["SavedEcForecastsPath"] or config['Paths']["SavedEcVsForecastsPath"]
     parser = argparse.ArgumentParser(description="Process forecasts and convert to RIMPro format.")
-    parser.add_argument("--source", help="Define file location (ec_forecasts, ec_vs_forecasts, bru_nowcast). File location must exist",default='ec_forecasts')
-    parser.add_argument("--suffix", help="File suffix to load the correct csv (must add .csv). File must exist before being converted to RIMpro.",default='_ec_forecast.csv')
+    parser.add_argument("--source", help="Define file location (ec_forecasts, ec_vs_forecasts, bru_nowcast). File location must exist",default='bru_nowcast')
+    parser.add_argument("--suffix", help="File suffix to load the correct csv. File must exist before being converted to RIMpro.",default='_bru_nowcast')
     args = parser.parse_args()
 
     config = load_config('ec_config.json')

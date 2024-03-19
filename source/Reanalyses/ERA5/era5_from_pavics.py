@@ -19,7 +19,7 @@ import xarray as xr
 from xclim import units
 from siphon.catalog import TDSCatalog
 from clisops.core import subset
-from source.utils import subsetting
+from utils import subsetting
 
 shape_path = f"C:\\Users\\{os.getenv('USERNAME')}\\OneDrive - IRDA\\GIS\\PAVICS\\RegionAgricolesQC.geojson"
 
@@ -56,7 +56,7 @@ def open_cds(cds, do_subset = True) -> xr.Dataset:
 
 def get_era_sample(ds):
     # from the dataset, only select a sample to make it easier for testing
-    ds_sub = subset.subset_time(ds, start_date="2020-01-01", end_date="2021-01-01")
+    ds_sub = subset.subset_time(ds, start_date="2020-01-01", end_date="2023-12-31")
     # subset box by specifying the longitude and latitude boundaries
     lon_bnds = [-74.4, -72.9]
     lat_bnds = [45.3, 45.9]

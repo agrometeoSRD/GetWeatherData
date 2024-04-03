@@ -18,7 +18,6 @@ python script_name.py --stations "Compton" "Dunham" --years "2020" "2021" --save
 Created: 2024-02-21
 """
 
-# Import statements
 import argparse
 import urllib
 import json
@@ -31,6 +30,8 @@ import numpy as np
 import pandas as pd
 import pytz
 from pandas.tseries.frequencies import to_offset
+from shapely.geometry import Point
+import geopandas as gpd
 
 # Constants
 # Configure basic logging
@@ -91,10 +92,35 @@ def convert_to_eastern(df, datetime_col='Date'):
 
     return df
 
+def get_SM_data_file():
+    print('Acquiring station list of all stations')
+    # Load list of all station file that contains names and coordinates of all stations
+    am_station_file_url = "http://meteo.irda.qc.ca/reseau_agrometeo.csv"
+    pomme_station_file_url = "http://meteo.irda.qc.ca/reseau_pommiers.csv"
+    am_station_file = pd.read_csv(am_station_file_url,encoding='latin1')
+    pomme_station_file = pd.read_csv(pomme_station_file_url,encoding='latin1')
+    # merge based on ID, NOM, Lat, Lon, Réseau
+    station_file = pd.concat([am_station_file,pomme_station_file]).reset_index(drop=True)
+    return station_file
+
+
+def get_stations_within_area(area_gdf):
+    stations_df = get_SM_data_file()
+    # Convert station coordinates to Point objects
+    stations_gdf = gpd.GeoDataFrame(
+        stations_df,
+        geometry=gpd.points_from_xy(stations_df.Lon, stations_df.Lat),
+        crs='EPSG:4326')
+
+    # Find stations within the area
+    stations_within_area = (gpd.sjoin(stations_gdf, area_gdf, predicate='within')
+                            .drop(columns=['geometry','index_right']))
+    return stations_within_area
+
 def convert_time(df:pd.DataFrame) -> pd.DataFrame:
     df['Hour'] = df['Hour'].astype(str).str.zfill(4) # pad with 0s
     df = (df.assign(Date =df['Year'].astype(str) + '-' + df['Day'].astype(str) + '-' + df['Hour'])
-            .assign(Date = lambda df: pd.to_datetime(df['Date'], format='%Y-%j-%H%M'))
+            .assign(Date = lambda df: pd.to_datetime(df['Date'], format='%Y-%j-%H%M',errors='coerce'))
             .drop(columns=['Year', 'Day', 'Hour'])
           )
     # palce datetime as first column
@@ -175,15 +201,19 @@ def download_and_process_data(station_names: List[str], years: List[str], config
         config = load_config()
 
     df_list = []
+    # Replace blank spaces with underscores for names. Remove accents as well
+    station_names = [unidecode.unidecode(name.replace(' ', '_')) for name in station_names]
+
     BRU_headers = config["BRU_date_headers"] + config["BRU_num_headers"]
     for station in station_names:
         for year in years:
             url = create_url(station, year)
             df = fetch_data(url, BRU_headers, set_column_types(config))
+            df['name'] = station
+            df = process_data(df)
             df_list.append(df)
 
-    df_all_stations = pd.concat(df_list)
-    df_all_stations = process_data(df_all_stations)
+    df_all_stations = pd.concat(df_list).dropna(subset=['Date']).reset_index(drop=True)
     return df_all_stations
 
 def save_data(df:pd.DataFrame,save_path: str, filename: str) -> None:

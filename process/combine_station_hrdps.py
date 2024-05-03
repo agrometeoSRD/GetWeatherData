@@ -79,7 +79,7 @@ def main():
     # set up parameters
     sel_year = datetime.datetime.now().strftime("%Y") # get current year (in string)
     # Load station info
-    dat_file = f"{station_path}\\VStations_test.dat"
+    dat_file = f"{station_path}\\VStations.dat"
     stations_info = pd.read_csv(dat_file, skiprows=2)
 
     for i, station_info in stations_info.iterrows():

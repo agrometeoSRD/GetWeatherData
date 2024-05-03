@@ -322,7 +322,7 @@ def save_forecast(forecast_df: pd.DataFrame, save_path: str, filename: str):
 # %% Read station information and process each station
 def parse_args():
     parser = argparse.ArgumentParser(description='Process weather forecast data.')
-    parser.add_argument('--dat-file', default=r"C:\Users\sebastien.durocher\PycharmProjects\GetWeatherData\test\VStations_p2.dat", help='Path to the .dat file with station information')
+    parser.add_argument('--dat-file', default=r"C:\Users\sebastien.durocher\PycharmProjects\GetWeatherData\test\VStations.dat", help='Path to the .dat file with station information')
     return parser.parse_args()
 
 def main(config,dat_file):

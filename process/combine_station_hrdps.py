@@ -1,5 +1,5 @@
 """
-File: combine_bru_hrdps.py
+File: combine_station_hrdps.py
 Author: sebastien.durocher
 Email: sebastien.rougerie-durocher@irda.qc.ca
 Github: https://github.com/MorningGlory747
@@ -35,6 +35,15 @@ def standardize_columns(df: pd.DataFrame) -> pd.DataFrame:
     # Apply the dictionnary map to replace columnns (if column are in the keys)
     return df.rename(columns=standardize_columns_dict)
 
+def read_quick_wu_online(station_name:str) -> pd.DataFrame:
+    url = f"http://meteo.irda.qc.ca/4z/{station_name}.csv"
+    df = pd.read_csv(url, sep=';',skiprows=1)
+    # Overwrite the column names to be standardized
+    df['Date'] = pd.to_datetime(df['DATE']) + pd.to_timedelta(df['TIME'].str.split(':').str[0].astype(int), unit='h')
+    # drop 'DATE' and 'TIME' column in order to just have one column for date
+    df = df.drop(columns=['DATE','TIME'])
+    return df
+
 # Load the .BRU files for selected stations
 def load_saved_nowcast_csv(InFile : str) -> pd.DataFrame:
     if os.path.isfile(InFile):
@@ -46,11 +55,11 @@ def load_saved_nowcast_csv(InFile : str) -> pd.DataFrame:
         return pd.DataFrame(columns=['Date'])
 
 # Combine the .BRU and nowcast data
-def concatenate_bru_nowcast(bru_df, nowcast_df):
-    bru_df_indexed = bru_df.assign(Date=pd.to_datetime(bru_df['Date'])).set_index('Date')
+def concatenate_station_nowcast(station_df, nowcast_df):
+    station_df_indexed = station_df.assign(Date=pd.to_datetime(station_df['Date'])).set_index('Date')
     nowcast_df_indexed = nowcast_df.assign(Date=pd.to_datetime(nowcast_df['Date'])).set_index('Date')
     # replace missing data from bru_df with that of nowcast_df
-    combined_df = bru_df_indexed.combine_first(nowcast_df_indexed).reset_index()
+    combined_df = station_df_indexed.combine_first(nowcast_df_indexed).reset_index()
     return combined_df
 
 # Save the combined data as .csv
@@ -70,21 +79,28 @@ def main():
     # set up parameters
     sel_year = datetime.datetime.now().strftime("%Y") # get current year (in string)
     # Load station info
-    dat_file = f"{station_path}\\VStations.dat"
+    dat_file = f"{station_path}\\VStations_test.dat"
     stations_info = pd.read_csv(dat_file, skiprows=2)
 
-    for i, _ in stations_info.iterrows():
+    for i, station_info in stations_info.iterrows():
         try :
+            sel_station_type = stations_info.loc[i,'Type']
             sel_station_name = stations_info.loc[i,'Name']
             sel_station_id = stations_info.loc[i,'ID']
-            bru_df = standardize_columns(download_and_process_data([sel_station_name], [sel_year])) # get the bru data
+            print(f'Processing station ID = {sel_station_id}')
 
-            if not bru_df.empty: # Only continue if .bru exists
+            if sel_station_type == 'WU':
+                station_df = standardize_columns(read_quick_wu_online(sel_station_name)) # get the wu data
+            elif sel_station_type == 'FADQ':
+                station_df = standardize_columns(download_and_process_data([sel_station_name], [sel_year])) # get the bru data
+            else:
+                print(f'Station Type not recognized for station ID = {sel_station_id}. Skipping to next station.')
+            if not station_df.empty: # Only continue if .bru exists
                 nowcast_df = load_saved_nowcast_csv(f'{save_path}\\{sel_station_id}{config["Filename_extension"]["EcVs"]}.csv') # get the nowcast
-                combined_df = concatenate_bru_nowcast(bru_df, nowcast_df) # merge together
+                combined_df = concatenate_station_nowcast(station_df, nowcast_df) # merge together
                 save_dataframe_to_csv(combined_df, save_path, f"{sel_station_id}_bru_nowcast") # save as csv
             else:
-                print('No .bru data found this file. Skipping to next station.')
+                print('No station data found this file. Skipping to next station.')
         except :
             print('Some problem occured at the given station. Creation of bru+nowcast was unsuccessful.')
             pass

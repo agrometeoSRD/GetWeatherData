@@ -74,6 +74,12 @@ def define_file_path(config, file_suffix):
         print('Invalid source file')
         sys.exit(1)
 
+def parse_args():
+    parser = argparse.ArgumentParser(description="Process forecasts and convert to RIMPro format.")
+    parser.add_argument("--source", help="Define file location (ec_forecasts, ec_vs_forecasts, bru_nowcast). File location must exist",default='bru_nowcast')
+    parser.add_argument("--suffix", help="Specify suffix to load the correct file (always assume csv). File must exist before being converted to RIMpro.",default='_bru_nowcast')
+    return parser.parse_args()
+
 def process_forecasts(config:dict, file_suffix:str, source:str):
     source_path = define_file_path(config, source)
     path_to_rimpro = config['Paths']["SavedRIMproPath"]
@@ -96,11 +102,7 @@ def process_forecasts(config:dict, file_suffix:str, source:str):
 # Main execution ---------------------------------------
 if __name__ == "__main__":
     # path examples :` config['Paths']["SavedEcForecastsPath"] or config['Paths']["SavedEcVsForecastsPath"]
-    parser = argparse.ArgumentParser(description="Process forecasts and convert to RIMPro format.")
-    parser.add_argument("--source", help="Define file location (ec_forecasts, ec_vs_forecasts, bru_nowcast). File location must exist",default='bru_nowcast')
-    parser.add_argument("--suffix", help="Specify suffix to load the correct file (always assume csv). File must exist before being converted to RIMpro.",default='_bru_nowcast')
-    args = parser.parse_args()
-
+    args = parse_args()
     config = load_config('ec_config.json')
     process_forecasts(config, args.suffix, args.source)
 

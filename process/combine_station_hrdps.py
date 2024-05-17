@@ -19,9 +19,11 @@ Created: 2024-02-27
 
 # Import statements
 import os
+import sys
 import pandas as pd
 import numpy as np
 import datetime
+import argparse
 from source.Observations.Stations.get_SM_data import download_and_process_data
 from utils.utils import load_config
 from utils.utils import invert_mapping
@@ -70,17 +72,24 @@ def save_dataframe_to_csv(forecast_df: pd.DataFrame, save_path: str, filename: s
 
 
 # Main execution ---------------------------------------
+def parse_args():
+    parser = argparse.ArgumentParser(description='Process weather forecast data.')
+    parser.add_argument('--dat-file', default=r"C:\Users\sebastien.durocher\PycharmProjects\GetWeatherData\test\VStations.dat", help='Path to the .dat file with station information')
+    return parser.parse_args()
 
-def main():
+def main(config,dat_file):
     # Load the configuration file
-    config = load_config('ec_config.json') # load config file that contains paths to folders
     save_path = config['Paths']["SavedEcVsForecastsPath"] # define as a variable the path to the data
-    station_path = config['Paths']["CoordinatesFilePath"]
+
     # set up parameters
     sel_year = datetime.datetime.now().strftime("%Y") # get current year (in string)
+
     # Load station info
-    dat_file = f"{station_path}\\VStations.dat"
-    stations_info = pd.read_csv(dat_file, skiprows=2)
+    try:
+        stations_info = pd.read_csv(dat_file, skiprows=2)
+    except Exception as e:
+        print(f"Error reading file {dat_file}: {e}")
+        sys.exit(1)
 
     for i, station_info in stations_info.iterrows():
         try :
@@ -106,7 +115,9 @@ def main():
             pass
 
 if __name__ == "__main__":
-    main()
+    args = parse_args()  # Parse command-line arguments
+    config = load_config('ec_config.json')
+    main(config,args.dat_file)  # Run the main function and pass the dat_file path to main()
 
 # TODO : Check what happens if file exists for nowcast (like RIMpro nowcast) but doesnt exist in .BRU
 # TODO : Check what happens if file exists for .BRU but doesnt exist for nowcast

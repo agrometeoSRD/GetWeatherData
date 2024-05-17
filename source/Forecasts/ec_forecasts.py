@@ -178,7 +178,7 @@ def process_request(station_info: pd.DataFrame, date_col: str) -> dict:
     """
     print(f'Acquiring forecast for station : {station_info["Name"]}')
     coor = [station_info['Lon'], station_info['Lat2'], station_info['Lon2'], station_info['Lat']]
-    timesteps_dict = {'HRDPS': 24, 'RDPS': 42, 'GDPS': 60}  # default values should be : 48, 84 and 120
+    timesteps_dict = {'HRDPS': 48, 'RDPS': 84, 'GDPS': 120}  # default values should be : 48, 84 and 120
 
     hrdps_df = run_hrdps(coor, timesteps_dict, date_col)
     rdps_df = run_rdps(coor, timesteps_dict, date_col)

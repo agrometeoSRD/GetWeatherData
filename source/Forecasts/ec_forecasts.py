@@ -178,7 +178,7 @@ def process_request(station_info: pd.DataFrame, date_col: str) -> dict:
     """
     print(f'Acquiring forecast for station : {station_info["Name"]}')
     coor = [station_info['Lon'], station_info['Lat2'], station_info['Lon2'], station_info['Lat']]
-    timesteps_dict = {'HRDPS': 48, 'RDPS': 84, 'GDPS': 120}  # default values should be : 48, 84 and 120
+    timesteps_dict = {'HRDPS': 24, 'RDPS': 42, 'GDPS': 60}  # default values should be : 48, 84 and 120
 
     hrdps_df = run_hrdps(coor, timesteps_dict, date_col)
     rdps_df = run_rdps(coor, timesteps_dict, date_col)
@@ -335,17 +335,17 @@ def main(config,dat_file):
 
     # Load station info
     try:
-        Stations_info = pd.read_csv(dat_file, skiprows=2)
+        stations_info = pd.read_csv(dat_file, skiprows=2)
     except Exception as e:
         logger.error(f"Error reading file {dat_file}: {e}")
         sys.exit(1)
 
     # Additional processing
-    Stations_info['Lon2'] = Stations_info['Lon'] + 0.1
-    Stations_info['Lat2'] = Stations_info['Lat'] - 0.1
+    stations_info['Lon2'] = stations_info['Lon'] + 0.1
+    stations_info['Lat2'] = stations_info['Lat'] - 0.1
 
     # Process each station
-    for i, row in Stations_info.iterrows():
+    for i, row in stations_info.iterrows():
         # Log progress
         logger.info(f"Processing station {row['ID']}")
         try:

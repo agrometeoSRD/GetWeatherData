@@ -1,0 +1,10 @@
+{
+  "AIRTEMP [C]": ["Temp", "Tair", "TMoy", "AIRTEMP"],
+  "RAIN [mm]": ["Precip", "Rainfall", "Prcp", "PR","RAIN"],
+  "wind_speed": ["WindSpd", "WS", "WindSpeed","Wind"],
+    "wind_direction": ["WindDir", "WD", "WindDirection"],
+  "max_temperature": ["Tmax", "MaxTemp"],
+    "min_temperature": ["Tmin", "MinTemp"],
+    "HR [percent]": ["Humidity", "Hum", "RH", "HR","AIRHUM"],
+  "GLOBALRAD [Wm2]": ["SolarRad", "SR", "Solar","InSW"]
+}

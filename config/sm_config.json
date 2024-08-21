@@ -1,0 +1,7 @@
+{
+    "BRU_date_headers": ["Year","Day","Hour"],
+    "BRU_num_headers": ["Num", "TMax", "TMin", "TMoy", "HR", "PR", "PR_start", "InSW", "Tair_5",
+                     "TGr_5", "TGr_10", "TGr_20", "TGr_50", "Wind", "WindDir", "Pressure", "Mouillure_feuil", "Mouillure_feuil_thres",
+                     "no_data", "no_data2"],
+  "path_to_save": "./data/stations"
+}

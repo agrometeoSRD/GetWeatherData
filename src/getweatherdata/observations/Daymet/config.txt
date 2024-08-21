@@ -1,0 +1,1 @@
+{"start_year": 1980, "end_year": 1981, "north": 50.0, "south": 49.0, "east": -63.0, "west": -65.0, "s_stride": 1, "t_stride": 1, "format": "netcdf", "out_path": "./"}

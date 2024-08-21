@@ -1,0 +1,22 @@
+{
+  "Paths": {
+    "EcScriptPath": "./source/Forecasts",
+    "SavedEcForecastsPath": "./data/saved_forecasts",
+    "SavedEcVsForecastsPath": "./data/saved_vs_forecasts",
+    "SavedRIMproPath": "./data/rimpro_format",
+    "CoordinatesFilePath": "./data/coordinates",
+    "TestPath": "./test"
+  },
+    "Filename_extension": {
+    "EcForecast": "_ec_forecast",
+    "EcVs": "_ec_vs",
+    "RIMpro": "FRP"
+  },
+  "General": {
+    "DateColumn": "Date",
+    "rain_col": "RAIN [mm]",
+    "temp_col": "AIRTEMP [C]",
+    "hr_col": "HR [percent]",
+    "rad_col": "GLOBALRAD [Wm2]"
+  }
+}

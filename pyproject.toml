@@ -18,7 +18,12 @@ classifiers = [
 ]
 license = {text = "Not open source"}
 dependencies = [
-  
+    "xarray",
+  "pandas",
+  "geopandas",
+  "clisops",
+  "dask",
+  "netCDF4"
 ]
 
 [project.optional-dependencies]

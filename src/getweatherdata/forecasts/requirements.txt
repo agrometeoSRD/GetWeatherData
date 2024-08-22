@@ -1,6 +1,0 @@
-aiohttp==3.8.1
-ephemeris==0.10.7
-numpy==1.24.2
-OWSLib==0.28.1
-pandas==1.5.1
-pytz==2021.1

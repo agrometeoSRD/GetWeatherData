@@ -2,9 +2,12 @@
 File: save_ec_nowcast.py
 Author: sebastien.durocher
 Email: sebastien.rougerie-durocher@irda.qc.ca
-Github: https://github.com/MorningGlory747
+Github: https://github.com/agrometeoSRD
 Description:
-- Create a virtual station by saving HRDPS "nowcast (0-6 hours)" into a csv file for a specific coordinate
+- This is a continuation of ec_forecast.py
+    While ec_forecast.py only gets forecast, save_ec_nowcast will
+    create a virtual station by saving HRDPS "nowcast (0-6 hours)" into a csv file for a specific coordinate
+
 - If the file already exists, it just adds on top of it
 - Searches for the most recent HRPDS forecast from saved_forecasts.csv
 - Adds this most recent forecast to the corresponding forecast in folder vs_forecast
@@ -113,19 +116,25 @@ def combine_past_and_current_forecast(past_df: pd.DataFrame, current_df: pd.Data
 
     return combined_df
 
-def fill_missing_hours(df, date_col):
+def fill_missing_hours(df:pd.DataFrame, date_col:str)->pd.DataFrame:
+    """
+    Fill missing hours in the dataframe with NaNs in order to have a continous time from start to finish of the dataframe
+
+    :param df: dataframe that contains the missing hours
+    :param date_col: name of the date column (kinda silly at this point that we're carrying it everywhere)
+    :return:
+    """
     min_date = df[date_col].min()
     max_date = df[date_col].max()
 
     # Create a DatetimeIndex for every hour between min_date and max_date
-    full_index = pd.date_range(min_date, max_date, freq='h')
+    full_index = pd.date_range(min_date, max_date, freq='H')
 
     # Set the date column as the index of the dataframe
-    df = (df.set_index(date_col)
-          .reindex(full_index)  # Reindex the dataframe using the full index, which fills in missing hours with NaNs
+    df = (df.set_index(date_col).reindex(
+        full_index)  # Reindex the dataframe using the full index, which fills in missing hours with NaNs
           .reset_index()  # Reset the index so the date column is a regular column again
-          .rename(columns={'index': date_col})
-          )
+          .rename(columns={'index': date_col}))
 
     # interpolate missing hours (backfill)
     df = df.interpolate()  # fill missing hours

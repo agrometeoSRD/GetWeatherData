@@ -1,5 +1,5 @@
 """Console script for getweatherdata."""
-import getweatherdata
+# not actually used, but will be useful for scripts that have CLI
 
 import typer
 from rich.console import Console
@@ -14,7 +14,7 @@ def main():
     console.print("Replace this message by putting your code into "
                "getweatherdata.cli.main")
     console.print("See Typer documentation at https://typer.tiangolo.com/")
-    
+
 
 
 if __name__ == "__main__":

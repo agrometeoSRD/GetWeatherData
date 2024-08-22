@@ -1,45 +1,67 @@
 # %%
 # !/usr/bin/env
 """
-Creation date: 2023-03-29
-Creator : sebastien durocher
-Python version : 3.10
+File: noaa_forecast.py
+Author: Sebastien Durocher
+Python: 3.10
+Email: sebastien.rougerie-durocher@irda.qc.ca
+Github: https://github.com/agrometeoSRD
+
+Status : functional, but not tested since directory changes
 
 Description:
-- Use the MSC API (oswlib) to get data from the geomet server.
-- Input requires a spatial coordinate (From a station file) and output will save forecast for this coordinate within a csv file.
+    This script retrieves weather forecast data from the MSC API (Meteorological Service of Canada) using the OWSLib library to interact with the GeoMet server.
+    The script is designed to extract meteorological variables such as temperature, humidity, precipitation, and solar radiation for specific spatial coordinates.
+    The output is saved as a CSV file, containing the forecast data for a given location over a specified time period.
 
-Updates: (see commits)
+Features:
+    - Extracts and processes data from the HRDPS (short term), RDPS (medium term) and GDPS (long term) models.
+    - Supports cumulative precipitation and solar radiation calculations by converting their cumulative values into hourly values.
+    - Provides a CLI interface for easy execution with customizable input files containing station information.
+    - Automatically handles Eastern Time Zone conversions for local time predictions.
+    - The script can be extended or modified to fit different time zones or other data processing needs.
 
 Notes:
-    - Unlike all past iterations of getting forecast, now the forecast script doesn't transform the data into RIMpro format
+    - The script assumes the default time zone as Eastern Time (America/Montreal) and may require adjustments for other regions.
+    - Precipitation is extracted in kg/m² and converted directly to mm assuming a 1:1 ratio with water density.
+    - Solar radiation is provided in J/m² and is converted to W/m² for hourly values.
+    - For detailed information about the variable descriptions, refer to the GeoMet GetCapabilities documentation:
+      https://geo.weather.gc.ca/geomet?lang=en&service=WMS&version=1.3.0&request=GetCapabilities
 
-    - This only works for eastern time zones
+Usage:
+    - The script can be executed from the command line with a station file containing spatial coordinates:
+      Example: `python -m source.forecasts.ec_forecast --dat-file THEPATH/test/vs_stations_test.dat`
+    - The output CSV file will contain columns such as DATE, AIRTEMP, HR, RAIN, GLOBALRAD, with hourly forecast data.
+    - Ensure that the input files are correctly formatted and that the script is run from the root directory of the project.
 
-    - Precipitaiton (PR TO RAIN) :
-        - Raw precipitation is in kg/m2, but assuming density of water to be 1kg/L, this gives us a 1:1 translation into mm
-        - Raw precipitaiton is also cumulative. Subtract by previous hour to get hourly precipitaiton
+TODO:
+    - Implement automated data retrieval for station coordinates and add necessary error handling.
+    - Develop functions for identifying and processing anomalous data.
+    - Integrate a progress bar to monitor the script's execution.
 
-    - Solar radiation (N4 to GLOBALRAD) :
-        - Raw solar radiation is in J/m2. To conver to W/m2, divide by 3600 (for seconds) (divide by 3*3600 for GDPS cause dt = 3 hours)
-        - The solar radiation is also cumulative. Subtract by previous hour to get hourly solar radiation
+Special dependencies:
+    - Required packages include OWSLib for web map services, pandas for data handling, and pytz for timezone management.
+    - The script has been especially tested with Python 3.10 and may require adjustments for compatibility with other versions.
 
-    - See : https://geo.weather.gc.ca/geomet?lang=en&service=WMS&version=1.3.0&request=GetCapabilities for more info on variable description
+Inputs:
+    - Spatial coordinates for the location of interest (provided through a station file).
+    - Temporal parameters, including start and end dates for the forecast data.
+    - Model-specific variables for data extraction (e.g., TT, HR, PR, N4 for temperature, humidity, precipitation, and radiation).
 
-    - CSV output should have the following structure
-    DATE AIRTEMP HR RAIN GLOBALRAD
-    2022-02-24 23:00:00 -12.291052 65.531517 0.0 50
+Outputs:
+    - The forecast data is saved in a CSV file with a specific format, allowing for easy integration into further analyses or tools.
 
-    - Example with the CLI (directory must be at the root of the project) :
-    python -m source.forecasts.ec_forecast --dat-file THEPATH/test/vs_stations_test.dat
+Example CLI Usage:
+    - The script can be executed using a command line interface, with station files passed as arguments.
+    (again make sure to run the script from the root directory of the project)
+      `python -m src.getweatherdata.forecasts.ec_forecast --dat-file path_to_file.dat`
 
+Created: 2023-03-29
 """
-# TODO : Create automatic file to get acces to station data. Add the necessary errors to make sure the data is there
-# TODO : Test fonctions for anomalous data
-# TODO : Find some way to incorporate a percentage progress bar
+
 
 # imports
-from getweatherdata.utils.utils import load_config
+from utils.utils import load_config
 import sys
 import os
 import re
@@ -94,11 +116,12 @@ def time_parameters(layer):
     return start_time, end_time, interval
 
 
-def setup_time(layer):
+def setup_time(layer:str):
     '''
-    This is what's proposed by ECCC in their tutorial
-    :param layer:
-    :return:
+    This is what's proposed by ECCC in their tutorial to handle time
+    Essentially we're creating an initial state from a single layer to get the initial time of the forecast
+    :param layer: a random layer name. Could have been any layer
+    :return: time_local, time_utc (both are lists that contain all of the forecast times)
     '''
     # Setup time
     au_tz = pytz.timezone('America/Montreal')
@@ -118,7 +141,7 @@ def setup_time(layer):
 
 
 # Function to get GDPS data
-def run_gdps(coor: list, nb_timestep: dict, date_col: str):
+def run_gdps(coor: list, nb_timestep: dict, date_col: str) -> pd.DataFrame:
     print('Getting GDPS')
     GDPS_varlist = ['GDPS.ETA_TT', 'GDPS.ETA_HR', 'GDPS.ETA_PR', 'GDPS.ETA_N4']
     time_local, time_utc = setup_time(GDPS_varlist[0])
@@ -149,7 +172,7 @@ def run_hrdps(coor: list, nb_timestep: dict, date_col: str) -> pd.DataFrame:
     return hrdps_df
 
 
-def run_rdps(coor: list, nb_timestep: dict, date_col: str):
+def run_rdps(coor: list, nb_timestep: dict, date_col: str) -> pd.DataFrame:
     print('Getting RDPS')
     RDPS_varlist = ['RDPS.ETA_TT', 'RDPS.ETA_HR', 'RDPS.ETA_PR', 'RDPS.ETA_N4']
     time_local, time_utc = setup_time(RDPS_varlist[0])
@@ -164,20 +187,20 @@ def run_rdps(coor: list, nb_timestep: dict, date_col: str):
 
 
 # Main processing function to get RDPS, GDPS, and HRDPS data for each station
-def process_request(station_info: pd.DataFrame, date_col: str) -> dict:
+def process_request(station_coor: pd.DataFrame, date_col: str) -> dict:
     """
     process_request is being applied on a pandas dataframe. Therefore, the output will be a pd.series where each row is the forecast dictionnary
 
-    Added intelligent timestep pacing for each forecast.
+    Added "intelligent" timestep pacing for each forecast.
     Meaning RDPS will only count times after HRDPS and GDPS will only count times after RDPS. HRDPS starts counting from the beggining.
-    To change the number of timesteps for each forecast, change the timesteps_dict variable
+    To change the number of timesteps for each forecast, change the timesteps_dict variable within the function
 
-    :param station_info:
-    :param nb_timestep:
-    :return:
+    :param station_coor: specific row of the station coordinates dataframe
+    :param date_col: name of the date column
+    :return: dictionnary that contains the forecast of each model (each key is the model, each value is the dataframe)
     """
-    print(f'Acquiring forecast for station : {station_info["Name"]}')
-    coor = [station_info['Lon'], station_info['Lat2'], station_info['Lon2'], station_info['Lat']]
+    print(f'Acquiring forecast for station : {station_coor["Name"]}')
+    coor = [station_coor['Lon'], station_coor['Lat2'], station_coor['Lon2'], station_coor['Lat']]
     timesteps_dict = {'HRDPS': 48, 'RDPS': 84, 'GDPS': 120}  # default values should be : 48, 84 and 120
 
     hrdps_df = run_hrdps(coor, timesteps_dict, date_col)
@@ -208,7 +231,14 @@ def concatenate_forecasts(forecast_dict: dict, date_col: str) -> pd.DataFrame:
     return df_merged[[date_col] + forecast_variables]
 
 
-def fill_missing_hours(df, date_col):
+def fill_missing_hours(df:pd.DataFrame, date_col:str)->pd.DataFrame:
+    """
+    Fill missing hours in the dataframe with NaNs in order to have a continous time from start to finish of the dataframe
+
+    :param df: dataframe that contains the missing hours
+    :param date_col: name of the date column (kinda silly at this point that we're carrying it everywhere)
+    :return:
+    """
     min_date = df[date_col].min()
     max_date = df[date_col].max()
 
@@ -335,17 +365,17 @@ def main(config,dat_file):
 
     # Load station info
     try:
-        stations_info = pd.read_csv(dat_file, skiprows=2)
+        station_coordinates = pd.read_csv(dat_file, skiprows=2)
     except Exception as e:
         logger.error(f"Error reading file {dat_file}: {e}")
         sys.exit(1)
 
     # Additional processing
-    stations_info['Lon2'] = stations_info['Lon'] + 0.1
-    stations_info['Lat2'] = stations_info['Lat'] - 0.1
+    station_coordinates['Lon2'] = station_coordinates['Lon'] + 0.1
+    station_coordinates['Lat2'] = station_coordinates['Lat'] - 0.1
 
     # Process each station
-    for i, row in stations_info.iterrows():
+    for i, row in station_coordinates.iterrows():
         # Log progress
         logger.info(f"Processing station {row['ID']}")
         try:

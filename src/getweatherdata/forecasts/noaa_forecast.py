@@ -3,40 +3,48 @@ File: noaa_forecast.py
 Author: sebastien.durocher
 Python : 3.11
 Email: sebastien.rougerie-durocher@irda.qc.ca
-Github: https://github.com/MorningGlory747
-Description: This code utilizes the NOAA Open Data Dissemination (NODD) Program and follows a tutorial provided by https://nbviewer.org/github/microsoft/AIforEarthDataSets/blob/main/data/noaa-hrrr.ipynb
-- Work in progress. Currently only extracts data for the HRRR model. Not tested, but works
-- Necessary dependancies :
-    cfgrib
+Github: https://github.com/agrometeoSRD
+Status : Functional, but not tested
+
+Description:
+    This script extracts weather forecast data from the NOAA Open Data Dissemination (NODD) Program, focusing specifically on the High-Resolution Rapid Refresh (HRRR) model.
+    It allows users to download, subset, and process HRRR data for specified variables and geographical coordinates. The script follows a tutorial provided by https://nbviewer.org/github/microsoft/AIforEarthDataSets/blob/main/data/noaa-hrrr.ipynb.
+
+Features:
+    - Extracts HRRR model data for specific time ranges and variables.
+    - Subsets data to the Quebec region by default using a GeoJSON file.
+    - Supports subsetting by custom geographical coordinates (GeoJSON, Shapefiles, or direct lat/lon input).
+    - Combines data from multiple time steps into a single xarray Dataset.
+    - Includes options to save the output as NetCDF or CSV files.
+
+Usage:
+    - Run `main()` to see a basic example of how to use the script to extract and process HRRR data.
+    - Ensure that the AREA_REDUCER_PATH points to a valid GeoJSON file for subsetting the data to the Quebec region.
+    - Modify the `variables` list and `time_list` in `main()` to customize the extraction process.
+
 Created: 2024-08-05
 """
 
 # Import statements
-
-# Constants
-
-# Functions
-
-# Main execution ---------------------------------------
-
-import io
 import os
 from datetime import date, datetime, timedelta
 import requests
 import tempfile
 import logging
-import concurrent.futures
 from typing import List, Dict, Union, Tuple, Sequence
 import pandas as pd
 import geopandas as gpd
 import xarray as xr
 from shapely.geometry import Point
 from clisops.core import subset
-from utils.utils import load_config
+import warnings
 
+# Constants
 CONFIG_FILE_NAME = "config.json"
 # AREA_REDUCER is a geojon file that contains the boundaries of Quebec only, since HRRR is for all of NA
 AREA_REDUCER_PATH = f"C:\\Users\\{os.getenv('USERNAME')}\\OneDrive - IRDA\\GIS\\PAVICS\\RegionAgricolesQC.geojson"
+
+# Functions
 class HRRRDataExtractor:
     def __init__(self, config_file: str = CONFIG_FILE_NAME):
         """
@@ -44,6 +52,9 @@ class HRRRDataExtractor:
 
         :param config_file: Path to the JSON configuration file for variable mapping
         """
+        #todo : create better condition for if subsetting to quebec should be an option or not (now it always is)
+        print('Subsetting data to Quebec area only')
+
         #todo : add config file to standardize file naming
         # self.config = self.load_config(CONFIG_FILE_NAME)
         self.blob_container = "https://noaahrrr.blob.core.windows.net/hrrr"
@@ -51,9 +62,8 @@ class HRRRDataExtractor:
         self.product = "wrfsfcf"
 
         # Configure logger
-        logging.basicConfig(level=logging.INFO)
+        logging.basicConfig(level=logging.INFO,format='%(asctime)s - %(levelname)s - %(message)s')
         self.logger = logging.getLogger(__name__)
-
 
     def get_hrrr_data(self, time_list: List[datetime],
                       variables: List[str], coordinates: Union[str, gpd.GeoDataFrame, pd.DataFrame, Dict[str, Sequence[float]]] = None) -> xr.Dataset:
@@ -156,8 +166,10 @@ class HRRRDataExtractor:
         # rename latitude and longitude coordinates to lat and lon (required for clisops)
         merged_ds = merged_ds.rename({'latitude':'lat','longitude':'lon'})
 
+        # change longitude coordinate of merged_ds from 0-360 to -180-180
+        merged_ds = merged_ds.assign_coords(lon=(merged_ds.lon + 180) % 360 - 180)
+
         # subset the data to Quebec area only
-        print('Subsetting data to Quebec area only')
         merged_ds = subset.subset_shape(merged_ds, AREA_REDUCER_PATH)
 
         # Apply subsetting if coordinates are provided (only works with subset_gridpoint which requires geographic dataset)
@@ -236,10 +248,18 @@ class HRRRDataExtractor:
         :param dataset: xarray Dataset to save
         :param output_path: Path to save the CSV file
         """
+        # Ensure the directory exists
+        output_dir = os.path.dirname(output_path)
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+            self.logger.info(f"\n Created directory: {output_dir}")
+
+        # Save the dataset to CSV
         df = dataset.to_dataframe()
         df.to_csv(output_path)
-        self.logger.info(f"CSV successfully saved to {output_path}")
+        self.logger.info(f"HRRR CSV successfully saved to {output_path}")
 
+# Main execution ---------------------------------------
 def main():
     extractor = HRRRDataExtractor()
 
@@ -250,8 +270,8 @@ def main():
         datetime(2024, 1, 2, 12, 0),
         datetime(2024, 1, 3, 18, 0),
     ]
-    # variables = ["snow_height", "snow_cover"]
-    variables = ["SNOD","SNOWC"]
+
+    variables = ["SNOD","SNOWC"]  # variables are for "snow_height" and "snow_cover"
 
     # Use IRDA as an example
     locations = {
@@ -267,7 +287,7 @@ def main():
     data = extractor.get_hrrr_data(time_list, variables, gdf)
 
     # extractor.save_to_netcdf(data, "output.nc") # to use if saving the entire netcdf
-    extractor.save_to_csv(data, "C:\\temp\\output.csv") # to use if saving only certain coordinates
+    extractor.save_to_csv(data, "C:\\temp_test\\output.csv") # to use if saving only certain coordinates
 
 if __name__ == "__main__":
     main()

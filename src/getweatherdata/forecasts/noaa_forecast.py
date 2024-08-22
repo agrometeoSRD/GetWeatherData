@@ -26,6 +26,7 @@ Created: 2024-08-05
 """
 
 # Import statements
+import utils.subsetting as subsetting_util
 import os
 from datetime import date, datetime, timedelta
 import requests
@@ -40,10 +41,10 @@ from clisops.core import subset
 import warnings
 
 # Constants
-CONFIG_FILE_NAME = "config.json"
-# AREA_REDUCER is a geojon file that contains the boundaries of Quebec only, since HRRR is for all of NA
-AREA_REDUCER_PATH = f"C:\\Users\\{os.getenv('USERNAME')}\\OneDrive - IRDA\\GIS\\PAVICS\\RegionAgricolesQC.geojson"
+CONFIG_FILE_NAME = "config.json" # this doesn't do anything, but eventually should be used to standardize variables and data format
 
+# AREA_REDUCER is a geojon file that contains the boundaries of Quebec only, since HRRR is for all of NA
+AREA_REDUCER_PATH = subsetting_util.get_shape_filename()
 # Functions
 class HRRRDataExtractor:
     def __init__(self, config_file: str = CONFIG_FILE_NAME):

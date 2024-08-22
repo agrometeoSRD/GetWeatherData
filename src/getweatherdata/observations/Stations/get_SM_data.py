@@ -1,27 +1,67 @@
 """
 File: get_SM_data.py
-Author: sebastien.durocher
+Author: Sebastien Durocher
+Python: 3.10
 Email: sebastien.rougerie-durocher@irda.qc.ca
-Github: https://github.com/MorningGlory747
-Description:
-- Fetches weather station data from http meteoirda/CIPRA (using CIPRA and not 4z, because CIPRA its easier to use)
-- Weather station data is stored as .BRU file. This has specific formatting that needs to be taken into account
-- Code allows loading of multiple .BRU files and concatenates them into a single dataframe
-- To find out which stations are available, use a specific file that stores the information (reseau_sm.csv)
-- Stored as a pandas and saved following a specific weather station format
+Github: https://github.com/agrometeoSRD
 
-Notes
-- By using CIPRA, we do not consider advance eastern time. Time is always UTC-5
-- To test directly on the CLI
-python script_name.py --stations "Compton" "Dunham" --years "2020" "2021" --save_path "./" --filename "test"
+Description:
+    This script fetches and processes weather station data from the IRDAMETEO server.
+    On the server, the weather data is stored in `.BRU` files. This is a specific format that needs to be modified for proper extraction and processing.
+
+    The script allows for the loading and concatenation of multiple `.BRU` files into a single pandas DataFrame.
+    It also provides functionality to retrieve a list of available stations, select specific stations and years of interest, and save the processed data in a standardized format.
+
+Features:
+    - Downloads weather station data that was downloaded from SM server
+    - Supports fetching data for multiple stations and years, combining them into a single dataset.
+    - Converts time data to Eastern Standard Time (UTC-5) without considering Daylight Saving Time (DST).
+        (In other words this script gets station data from /CIPRA/ and converts it to EST)
+    - Processes weather data by creating appropriate datetime columns, handling missing data, and converting units (e.g., solar radiation).
+    - Includes functionality to find the nearest station to a given coordinate or retrieve stations within a specific geographic area (not fully tested).
+
+Usage:
+    - The script can be executed from the command line with specific stations and years provided as arguments.
+      Example:  python -m src.getweatherdata.observations.Stations.get_SM_data --stations "Compton" "Dunham" --years "2020" "2021" --save_path "./" --filename "test"
+        Note : must be within the location of the script to execute this command
+        Note2 : See end of description for more examples
+    - The output will be saved as a CSV file, with a "standardized" format
+
+Notes:
+    - The data is fetched from the cipra directory, which does not account for Daylight Saving Time, and all times are assumed to be in UTC-5. A conversion is done here to convert into local times
+    - The script automatically handles the conversion of special values (e.g., -991) to NaN for cleaner data processing.
+    - Ensure that the correct station names and years are provided, as the script relies on these to construct the URLs for data retrieval.
+    - The output CSV file will contain columns like Date, Temperature, Humidity, Precipitation, Solar Radiation, etc., based on the `.BRU` file format.
+        - For more infromation on the .BRU file format, see : https://meteo.irda.qc.ca/Format%20fichiers%20meteo.pdf
+
+TODO:
+    - Implement additional data processing steps to handle specific edge cases or anomalous data points.
+    - Add more options for saving data, such as different formats (e.g., NetCDF, Excel) or customizable output structures.
+    - Integrate a progress bar to monitor the download and processing of large datasets.
+
+Dependencies:
+    - The script has been tested with Python 3.10 and may require adjustments for compatibility with other versions.
+
+Inputs when running from main:
+    - The input is a list of station names and years for which data should be retrieved, provided via command-line arguments.
+    - The configuration file (`sm_config.json`) should be available within the project directory, as it defines the columns and types expected in the `.BRU` files.
+
+Outputs:
+    - The processed weather data is saved as a CSV file, with a standardized format suitable for further analysis or reporting.
+
+Example CLI Usage:
+    - The script can be executed using a command line interface, with station names and years passed as arguments.
+       python -m src.getweatherdata.observations.Stations.get_SM_data --stations "Compton" "Dunham" --years "2020" "2021" --save_path "./" --filename "test"
+       python -m src.getweatherdata.observations.Stations.get_SM_data --stations "Baie-Comeau" --years "2005" "2020" --save_path "C://tmptest//" --filename "Baie-Comeau_2005_2020"
+        In this example, Baie-Comeau station didnt exist in 2005, therefore only 2020 data was obtained
 
 Created: 2024-02-21
 """
-from getweatherdata.utils.utils import load_config
+
+import os
+from utils.utils import load_config
 import argparse
 import urllib
-import json
-from importlib import resources # avoids hardocding the path
 import logging
 import unidecode
 import datetime
@@ -87,8 +127,26 @@ def convert_to_eastern(df, datetime_col='Date'):
 
     return df
 
-def get_SM_data_file():
-    # Load list of all station file that contains names and coordinates of all stations
+def get_SM_data_file() -> pd.DataFrame:
+    """
+    Load list of all station files that contain names and coordinates of all stations.
+    returns a dataframe with the station names, coordinates, and other metadata.
+
+    Note: These files may become outdated eventually. See https://www.agrometeo.org/weather/help for updated files.
+    """
+
+    # Define the specific date
+    specific_date = datetime.datetime(2024, 8, 1) # update to the current time when the file is updated
+    current_date = datetime.datetime.now()
+
+    # Calculate the difference in months
+    difference_in_months = (current_date.year - specific_date.year) * 12 + current_date.month - specific_date.month
+
+    # Check if the difference is greater than or equal to 6 months
+    if difference_in_months >= 6:
+        logging.warning("It has been more than 6 months since station metadata has been uploaded to meteo.irda. Consider updating the files in the URLs.")
+
+
     am_station_file_url = "http://meteo.irda.qc.ca/reseau_agrometeo.csv"
     pomme_station_file_url = "http://meteo.irda.qc.ca/reseau_pommiers.csv"
     am_station_file = pd.read_csv(am_station_file_url,encoding='latin1')
@@ -98,7 +156,22 @@ def get_SM_data_file():
     return station_file
 
 
-def get_stations_within_area(area_gdf):
+def get_stations_within_area(area_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    """
+    Finds weather stations within a specified geographic area.
+
+    Note : this function is not fully tested
+
+    Parameters:
+    area_gdf (geopandas.GeoDataFrame): A GeoDataFrame representing the geographic area of interest.
+                                       The GeoDataFrame should have a geometry column with polygon geometries.
+
+    Returns:
+    geopandas.GeoDataFrame: A GeoDataFrame containing the weather stations that fall within the specified area.
+                            The returned GeoDataFrame includes all columns from the original stations data,
+                            except for the geometry and index_right columns.
+    """
+    # Retrieve the list of all weather stations
     stations_df = get_SM_data_file()
     # Convert station coordinates to Point objects
     stations_gdf = gpd.GeoDataFrame(
@@ -112,8 +185,20 @@ def get_stations_within_area(area_gdf):
     return stations_within_area
 
 def find_nearest_station(lat: float, lon: float):
-    # Note : warning will happen because we are using projected coordinated system instead of a reference coordinate system
-    # However, we're not dealing with very precise calculations here, so its fine.
+    """
+    Finds the nearest weather station to a given latitude and longitude.
+    Output is a series of metadata containing name, latitude, longitude, types of variables, etc. for the nearest station
+
+    Parameters:
+    lat (float): The latitude of the point of interest.
+    lon (float): The longitude of the point of interest.
+
+    Returns:
+    geopandas.GeoSeries: A GeoSeries containing the information of the nearest weather station, including its distance from the input point.
+
+    Notes:
+    - A warning may occur because a projected coordinate system is used instead of a reference coordinate system. However, this is acceptable for the current level of precision.
+    """
 
     # Retrieve the list of all weather stations
     stations_df = get_SM_data_file()
@@ -136,9 +221,6 @@ def find_nearest_station(lat: float, lon: float):
     # Return the nearest station's information
     return nearest_station
 
-# Example usage
-# nearest_station = find_nearest_station(45.5017, -73.5673)
-# print(nearest_station)
 
 def convert_time(df:pd.DataFrame) -> pd.DataFrame:
     df['Hour'] = df['Hour'].astype(str).str.zfill(4) # pad with 0s
@@ -239,16 +321,18 @@ def download_and_process_data(station_names: List[str], years: List[str], config
     df_all_stations = pd.concat(df_list).dropna(subset=['Date']).reset_index(drop=True)
     return df_all_stations
 
-def save_data(df:pd.DataFrame,save_path: str, filename: str) -> None:
+def save_data(df: pd.DataFrame, save_path: str, filename: str) -> None:
     """
     Saves the weather station data
     """
-    #TODO : Add more saving options
+    # Check if the directory exists, if not, create it
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
 
     # Save as csv
     out = f"{save_path}\\{filename}.csv"
     logger.info(f'Saving station file to : {out}')
-    df.to_csv(out, index=False,na_rep=np.nan)
+    df.to_csv(out, index=False, na_rep=np.nan)
 
 # Main execution ---------------------------------------
 def main(args):

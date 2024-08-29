@@ -19,7 +19,7 @@ import xarray as xr
 from xclim import units
 from siphon.catalog import TDSCatalog
 from clisops.core import subset
-from utils import subsetting
+from ...utils import subsetting
 
 shape_path = f"C:\\Users\\{os.getenv('USERNAME')}\\OneDrive - IRDA\\GIS\\PAVICS\\RegionAgricolesQC.geojson"
 

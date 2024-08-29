@@ -15,7 +15,7 @@ Created: 2024-04-12
 # Import statements
 import pandas as pd
 import os
-from utils.utils import load_config
+from ..utils.utils import load_config
 
 # Constants
 

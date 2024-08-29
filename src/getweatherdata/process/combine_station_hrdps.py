@@ -24,13 +24,12 @@ import pandas as pd
 import numpy as np
 import datetime
 import argparse
-from getweatherdata.source.Observations.Stations.get_SM_data import download_and_process_data
-from getweatherdata.utils.utils import load_config
-from getweatherdata.utils.utils import standardize_columns
+from ..observations.Stations.get_SM_data import download_and_process_data
+from ..utils.utils import load_config
+from ..utils.utils import standardize_columns
 # Constants
 
 # Functions
-
 
 def read_quick_wu_online(station_name:str) -> pd.DataFrame:
     url = f"http://meteo.irda.qc.ca/4z/{station_name}.csv"

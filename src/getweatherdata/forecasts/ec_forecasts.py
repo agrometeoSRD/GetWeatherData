@@ -61,7 +61,7 @@ Created: 2023-03-29
 
 
 # imports
-from utils.utils import load_config
+from ..utils.utils import load_config
 import sys
 import os
 import re

@@ -30,7 +30,7 @@ import os
 import glob
 import numpy as np
 import pandas as pd
-from utils.utils import load_config
+from ..utils.utils import load_config
 
 # Constants
 

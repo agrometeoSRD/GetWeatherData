@@ -26,7 +26,7 @@ Created: 2024-08-05
 """
 
 # Import statements
-import utils.subsetting as subsetting_util
+from ..utils import subsetting as subsetting_util
 import os
 from datetime import date, datetime, timedelta
 import requests

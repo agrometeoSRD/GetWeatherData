@@ -23,7 +23,7 @@ import numpy as np
 import pandas as pd
 import glob
 
-from utils.utils import load_config
+from ..utils.utils import load_config
 
 # Constants
 

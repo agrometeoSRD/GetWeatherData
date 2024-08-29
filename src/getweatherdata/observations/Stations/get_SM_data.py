@@ -59,7 +59,7 @@ Created: 2024-02-21
 """
 
 import os
-from utils.utils import load_config
+from ...utils.utils import load_config
 import argparse
 import urllib
 import logging

@@ -40,14 +40,20 @@ bugs = "https://github.com/agrometeoSRD/getweatherdata/issues"
 changelog = "https://github.com/agrometeoSRD/getweatherdata/blob/master/changelog.md"
 homepage = "https://github.com/agrometeoSRD/getweatherdata"
 
-[tool.setuptools]
-package-dir = {"" = "src"}
+[tool.hatch.build.targets.wheel]
+packages = ["src/getweatherdata"]
 
-[tool.setuptools.package-data]
-"*" = ["*.*"]
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src",
+]
 
-
-
+[tool.hatch.build]
+include = [
+    "src/**/*.py",
+    "src/**/*.json",
+    "src/**/*.txt",
+]
 
 # Mypy
 # ----

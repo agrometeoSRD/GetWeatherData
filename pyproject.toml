@@ -55,6 +55,9 @@ include = [
     "src/**/*.txt",
 ]
 
+[tool.flit.sdist]
+include = ["getweatherdata/config/*.json"]
+
 # Mypy
 # ----
 

@@ -17,35 +17,36 @@ import pandas as pd
 
 # Functions
 
-def get_project_root(current_directory: Path) -> Path:
-    if (current_directory / 'config').exists():
-        return current_directory
-    parent_directory = current_directory.parent
-    if parent_directory == current_directory:
-        raise FileNotFoundError("Failed to find the project root directory.")
-    return get_project_root(parent_directory)
-
 def load_config(config_filename: str = "sm_config.json"):
-    # Get the directory of the root folder
-    project_root = get_project_root(Path(__file__).parent)
+    # First, try to find the config file in the current working directory
+    cwd = Path.cwd()
+    config_path = cwd / config_filename
 
-    # Get the path to the configuration file
-    config_path = project_root / 'config' / config_filename
+    if not config_path.is_file():
+        # If not found, look in the package directory
+        package_dir = Path(__file__).parent.parent
+        config_path = package_dir / 'config' / config_filename
 
-    # Check if the configuration file exists
-    if not os.path.isfile(config_path):
-        raise FileNotFoundError(f"Configuration file does not exist: {config_path}")
+    if not config_path.is_file():
+        raise FileNotFoundError(f"Configuration file '{config_filename}' not found in current directory or package directory.")
 
     with open(config_path, 'r') as f:
-         config = json.load(f)
+        config = json.load(f)
 
-    # Attach the paths from config to the root path of the project
+    # If 'Paths' in config, make them absolute based on the config file location
     if 'Paths' in config:
         for key, path in config['Paths'].items():
-            absolute_path = (project_root / path).resolve()
+            absolute_path = (config_path.parent / path).resolve()
             config['Paths'][key] = str(absolute_path)
 
     return config
+
+def get_package_directory():
+    return Path(__file__).parent.parent
+
+# You might want to keep this function for backwards compatibility
+def get_project_root(current_directory: Path) -> Path:
+    return get_package_directory()
 
 def invert_mapping(mapping:dict):
     'takes a dictionnary (expected from column_names.json) and inverts it'

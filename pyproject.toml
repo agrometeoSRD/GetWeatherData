@@ -16,7 +16,7 @@ maintainers = [
 classifiers = [
 
 ]
-license = {text = "Not open source"}
+license = {text = "Open source"}
 dependencies = [
     "xarray",
   "pandas",
@@ -40,6 +40,16 @@ bugs = "https://github.com/agrometeoSRD/getweatherdata/issues"
 changelog = "https://github.com/agrometeoSRD/getweatherdata/blob/master/changelog.md"
 homepage = "https://github.com/agrometeoSRD/getweatherdata"
 
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["getweatherdata*"]
+
+[tool.setuptools.package-data]
+"getweatherdata" = ["config/*.json", "**/*.txt"]
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/getweatherdata"]
 
@@ -54,9 +64,6 @@ include = [
     "src/**/*.json",
     "src/**/*.txt",
 ]
-
-[tool.flit.sdist]
-include = ["getweatherdata/config/*.json"]
 
 # Mypy
 # ----
